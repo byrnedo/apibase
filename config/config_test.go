@@ -13,11 +13,11 @@ func TestParse(t *testing.T) {
 		t.Error("Failed to read ../test.conf:" + err.Error())
 	}
 
-	if conf.Http.Port != 1234 {
+	if conf.GetInt("http.port") != 1234 {
 		t.Error("Incorrect Port value")
 	}
 
-	if conf.Http.Host != "abcdef" {
+	if conf.GetString("http.host") != "abcdef" {
 		t.Error("Incorrect Url value")
 	}
 
