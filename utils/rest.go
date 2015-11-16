@@ -10,22 +10,27 @@ import (
 )
 
 type RestClient struct {
+	Headers map[string]string
+
 	client           *http.Client
-	Headers          map[string]string
 	lastResponse     http.Response
 	lastResponseBody []byte
 }
 
 func NewRestClient() *RestClient {
 	timeout := time.Duration(5 * time.Second)
-	return &RestClient{&http.Client{Timeout: timeout}, nil, http.Response{}, nil}
+	return &RestClient{nil, &http.Client{Timeout: timeout}, http.Response{}, nil}
 }
 
-func (c *RestClient) ResponseBody() []byte {
+func (c *RestClient) Client() *http.Client {
+	return c.Client()
+}
+
+func (c *RestClient) LastResponseBody() []byte {
 	return c.lastResponseBody
 }
 
-func (c *RestClient) ResponseStatus() int {
+func (c *RestClient) LastResponseStatus() int {
 	return c.lastResponse.StatusCode
 }
 
