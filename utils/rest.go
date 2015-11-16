@@ -82,5 +82,27 @@ func (c *RestClient) PostJson(url string, data interface{}) error {
 		return err
 	}
 	return c.Post(url, bytes.NewBuffer(byteData))
+}
 
+func (c *RestClient) Put(url string, data io.Reader) error {
+
+	req, err := http.NewRequest("PUT", url, data)
+	if err != nil {
+		return err
+	}
+
+	return doRequest(c, req)
+}
+
+func (c *RestClient) PutString(url string, data string) error {
+	return c.Put(url, bytes.NewBufferString(data))
+}
+
+func (c *RestClient) PutJson(url string, data interface{}) error {
+
+	byteData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return c.Put(url, bytes.NewBuffer(byteData))
 }
