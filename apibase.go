@@ -10,22 +10,17 @@ import (
 )
 
 var (
-	cnf         config.Config
+	Conf config.Config
 	configFile  string
 	logFilePath string
 	showUsage   bool
 )
 
-func createLogger() {
+func createLogger(logFilePath string) {
 
 	var (
 		logOpts *LogOptions
-		err     error
 	)
-
-	if logFilePath, err = cnf.GetString("log-file"); err != nil {
-		fmt.Println("No log-file config var, logging to std out/err")
-	}
 
 	if len(logFilePath) > 0 {
 		file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
@@ -65,12 +60,16 @@ func Init() {
 		os.Exit(1)
 	}
 
-	cnf = config.Config{}
-	err := cnf.ParseFile(configFile)
+	Conf = config.Config{}
+	err := Conf.ParseFile(configFile)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error parsing config file:"+err.Error())
 		os.Exit(1)
 	}
 
-	createLogger()
+	if logFilePath, err = Conf.GetString("log-file"); err != nil {
+		fmt.Println("No log-file config var, logging to std out/err")
+	}
+
+	createLogger(logFilePath)
 }
