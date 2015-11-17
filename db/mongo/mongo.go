@@ -23,7 +23,7 @@ func Conn() *mgo.Session {
 // First checks for environent variable GOAX_MONGODB_URL
 func Init(url string, debugLog *log.Logger) {
 
-	if debugLog =! nil {
+	if debugLog != nil {
 		mgo.SetDebug(true)
 		mgo.SetLogger(debugLog)
 	}

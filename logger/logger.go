@@ -17,7 +17,7 @@ var (
 )
 
 func GetLogOptions() LogOptions {
-	return baseOptions
+	return *baseOptions
 }
 
 type LogOptions struct {
