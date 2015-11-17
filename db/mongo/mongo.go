@@ -3,7 +3,6 @@ package mongo
 import (
 	"errors"
 	"log"
-	"os"
 	"reflect"
 	"strings"
 
@@ -22,18 +21,11 @@ func Conn() *mgo.Session {
 
 // Dial up to mongo using the "mongodb-url" from the app.conf
 // First checks for environent variable GOAX_MONGODB_URL
-func Init(url string, debug bool ) {
-	envUrl := os.Getenv("MONGODB_URL")
-	if len(envUrl) > 0 {
-		Info.Println("Found env GOAX_MONGODB_URL, using that")
-		url = envUrl
-	}
+func Init(url string, debugLog *log.Logger) {
 
-	if debug == true {
+	if debugLog =! nil {
 		mgo.SetDebug(true)
-		var aLogger *log.Logger
-		aLogger = log.New(os.Stderr, "mgo: ", log.LstdFlags)
-		mgo.SetLogger(aLogger)
+		mgo.SetLogger(debugLog)
 	}
 
 	Info.Println("Attempting to connect to [" + url + "]")

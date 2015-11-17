@@ -11,8 +11,14 @@ var (
 	Warning *log.Logger
 	Error   *log.Logger
 
+	baseOptions *LogOptions
+
 	logFormat int = log.Ldate | log.Ltime | log.Lshortfile
 )
+
+func GetLogOptions() LogOptions {
+	return baseOptions
+}
 
 type LogOptions struct {
 	TraceHandle   io.Writer
@@ -45,6 +51,7 @@ func (options *LogOptions) seedDefaults() {
 
 func InitLog(options LogOptions){
 	options.seedDefaults()
+	baseOptions = &options
 
 	Trace = log.New(options.TraceHandle,
 		"TRACE: ",
