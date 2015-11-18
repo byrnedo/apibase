@@ -51,16 +51,14 @@ func mgoSelect(fields ...string) (selBson bson.M) {
 
 // GetAll retrieves all records matches certain condition. Returns empty list if
 // no records exist
-func GetAll(
-table string,
-query map[string]string, // TODO
-fields []string,
-sortby []string,
-order []string,
-offset int,
-limit int,
-result interface{},
-) (err error) {
+func GetAll(table string,
+			query map[string]string, // TODO
+			fields []string,
+ 			sortby []string,
+			order []string,
+			offset int,
+			limit int,
+			result interface{}) (err error) {
 
 	resultv := reflect.ValueOf(result)
 	if resultv.Kind() != reflect.Ptr || resultv.Elem().Kind() != reflect.Slice {
