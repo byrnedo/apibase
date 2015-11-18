@@ -15,6 +15,21 @@ type Route struct {
 	handler func(*nats.Conn, *nats.EncodedConn, nats.Msg)
 }
 
+// InitOpts : Initiating nats with default options
+func NewNats(optionFuncs  ...func(*Nats)) (options *Nats) {
+	options = &Nats{}
+	options.setOptions(setDefaultOptions, optionFuncs)
+	return
+
+	//	if envNatsUrl := os.Getenv("GOAX_GNATSD_URL"); envNatsUrl != "" {
+	//		options.Servers = []string{envNatsUrl}
+	//		options.Url = ""
+	//	} else if len(options.Servers) == 0 {
+	//		options.Servers = []string{options.Url}
+	//		options.Url = ""
+	//	}
+}
+
 func (n *Nats) setOptions(optionFuncs ...func(*nats.Options)) error {
 	for _, opt := range optionFuncs {
 		if err := opt(n); err != nil {
@@ -23,7 +38,6 @@ func (n *Nats) setOptions(optionFuncs ...func(*nats.Options)) error {
 	}
 	return nil
 }
-
 func setDefaultOptions(options *nats.Options) error {
 	// Optionally set ReconnectWait and MaxReconnect attempts.
 	// This example means 10 seconds total per backend.
@@ -36,20 +50,18 @@ func setDefaultOptions(options *nats.Options) error {
 	return nil
 }
 
-// InitOpts : Initiating nats with default options
-func NewNats(routes []Route, optionFuncs  ...func(*Nats)) (options *Nats) {
-	options = &Nats{}
-	options.setOptions(setDefaultOptions, optionFuncs)
-	options.routes = routes
-	return
-
-	//	if envNatsUrl := os.Getenv("GOAX_GNATSD_URL"); envNatsUrl != "" {
-	//		options.Servers = []string{envNatsUrl}
-	//		options.Url = ""
-	//	} else if len(options.Servers) == 0 {
-	//		options.Servers = []string{options.Url}
-	//		options.Url = ""
-	//	}
+func (n *Nats) HandleFunc(route string, handler func(*nats.Conn, *nats.EncodedConn, nats.Msg)){
+	n.routes = append(n.routes, &Route{route, handler})
 }
+
+func (n *Nats) ListenAndServe() error {
+	_, err := n.Connect()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+
 
 
