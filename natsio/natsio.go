@@ -33,13 +33,10 @@ func (n *Nats) setOptions(optionFuncs ...func(*nats.Options)) error {
 	return nil
 }
 func setDefaultOptions(options *nats.Options) error {
-	// Optionally set ReconnectWait and MaxReconnect attempts.
-	// This example means 10 seconds total per backend.
 	options = nats.DefaultOptions
 	options.MaxReconnect = 5
 	options.ReconnectWait = (2 * time.Second)
 	options.Timeout = (10 * time.Second)
-	// Optionally disable randomization of the server pool
 	options.NoRandomize = true
 	return nil
 }
@@ -48,6 +45,7 @@ func (n *Nats) HandleFunc(route string, handler nats.Handler){
 	n.routes = append(n.routes, &Route{route, handler})
 }
 
+// Start subscribing to subjects/routes. This is non blocking.
 func (n *Nats) ListenAndServe() error {
 	con, err := n.Connect()
 	if err != nil {
@@ -70,6 +68,12 @@ func (n *Nats) ListenAndServe() error {
 
 func (n *Nats) GetRoutes() []*Route{
 	return n.routes
+}
+
+func (n *Nats) UnsubscribeAll() {
+	for _, route := range n.routes {
+		route.Subsc.Unsubscribe()
+	}
 }
 
 
