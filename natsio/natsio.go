@@ -3,31 +3,25 @@ package natsio
 import (
 	"github.com/apcera/nats"
 	"time"
+	"errors"
 )
 
 type Nats struct {
 	*nats.Options
-	routes []Route
+	routes []*Route
 }
 
 type Route struct {
-	route   string
-	handler func(*nats.Conn, *nats.EncodedConn, nats.Msg)
+	Route   string
+	Handler func(*nats.EncodedConn, nats.Msg)
+	Subsc  *nats.Subscription
 }
 
-// InitOpts : Initiating nats with default options
+// Initiating nats with default options
 func NewNats(optionFuncs  ...func(*Nats)) (options *Nats) {
 	options = &Nats{}
 	options.setOptions(setDefaultOptions, optionFuncs)
 	return
-
-	//	if envNatsUrl := os.Getenv("GOAX_GNATSD_URL"); envNatsUrl != "" {
-	//		options.Servers = []string{envNatsUrl}
-	//		options.Url = ""
-	//	} else if len(options.Servers) == 0 {
-	//		options.Servers = []string{options.Url}
-	//		options.Url = ""
-	//	}
 }
 
 func (n *Nats) setOptions(optionFuncs ...func(*nats.Options)) error {
@@ -50,16 +44,32 @@ func setDefaultOptions(options *nats.Options) error {
 	return nil
 }
 
-func (n *Nats) HandleFunc(route string, handler func(*nats.Conn, *nats.EncodedConn, nats.Msg)){
+func (n *Nats) HandleFunc(route string, handler func(*nats.EncodedConn, nats.Msg)){
 	n.routes = append(n.routes, &Route{route, handler})
 }
 
 func (n *Nats) ListenAndServe() error {
-	_, err := n.Connect()
+	con, err := n.Connect()
 	if err != nil {
 		return err
 	}
+
+	encCon, err := nats.NewEncodedConn(con, "gob")
+	if err != nil {
+		return err
+	}
+
+	for _, route := range n.routes {
+		route.Route, err = encCon.Subscribe(route.Route, route.Route)
+		if err != nil {
+			return errors.New("Failed to make subcriptions for " + route.Route + ": " + err.Error())
+		}
+	}
 	return nil
+}
+
+func (n *Nats) GetRoutes() []*Route{
+	return n.routes
 }
 
 
