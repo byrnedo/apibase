@@ -13,8 +13,8 @@ type Nats struct {
 
 type Route struct {
 	Route   string
-	Handler func(*nats.EncodedConn, nats.Msg)
-	Subsc  *nats.Subscription
+	Handler nats.Handler
+	Subsc   *nats.Subscription
 }
 
 // Initiating nats with default options
@@ -44,7 +44,7 @@ func setDefaultOptions(options *nats.Options) error {
 	return nil
 }
 
-func (n *Nats) HandleFunc(route string, handler func(*nats.EncodedConn, nats.Msg)){
+func (n *Nats) HandleFunc(route string, handler nats.Handler){
 	n.routes = append(n.routes, &Route{route, handler})
 }
 
@@ -60,7 +60,7 @@ func (n *Nats) ListenAndServe() error {
 	}
 
 	for _, route := range n.routes {
-		route.Route, err = encCon.Subscribe(route.Route, route.Route)
+		route.Route, err = encCon.Subscribe(route.Route, route.Handler)
 		if err != nil {
 			return errors.New("Failed to make subcriptions for " + route.Route + ": " + err.Error())
 		}
