@@ -11,20 +11,29 @@ type Nats struct {
 	routes []*Route
 }
 
+type OptionsFunc func(*Nats) error
+
 type Route struct {
 	Route   string
 	Handler nats.Handler
 	Subsc   *nats.Subscription
 }
 
+func prepend(slice []OptionsFunc, item OptionsFunc) []OptionsFunc{
+	slice = append(slice, nil)
+	copy(slice[1:], slice)
+	slice[0] = item
+	return slice
+}
+
 // Initiating nats with default options
-func NewNats(optionFuncs  ...func(*Nats)) (options *Nats) {
+func NewNats(optionFuncs  ...OptionsFunc) (options *Nats) {
 	options = &Nats{}
-	options.setOptions(setDefaultOptions, optionFuncs)
+	options.setOptions(prepend(optionFuncs, setDefaultOptions)...)
 	return
 }
 
-func (n *Nats) setOptions(optionFuncs ...func(*nats.Options)) error {
+func (n *Nats) setOptions(optionFuncs ...OptionsFunc) error {
 	for _, opt := range optionFuncs {
 		if err := opt(n); err != nil {
 			return err
@@ -32,8 +41,8 @@ func (n *Nats) setOptions(optionFuncs ...func(*nats.Options)) error {
 	}
 	return nil
 }
-func setDefaultOptions(options *nats.Options) error {
-	options = nats.DefaultOptions
+func setDefaultOptions(options *Nats) error {
+	options.Options = &nats.DefaultOptions
 	options.MaxReconnect = 5
 	options.ReconnectWait = (2 * time.Second)
 	options.Timeout = (10 * time.Second)
@@ -42,7 +51,7 @@ func setDefaultOptions(options *nats.Options) error {
 }
 
 func (n *Nats) HandleFunc(route string, handler nats.Handler){
-	n.routes = append(n.routes, &Route{route, handler})
+	n.routes = append(n.routes, &Route{Route: route,Handler: handler, Subsc: nil})
 }
 
 // Start subscribing to subjects/routes. This is non blocking.
@@ -58,7 +67,7 @@ func (n *Nats) ListenAndServe() error {
 	}
 
 	for _, route := range n.routes {
-		route.Route, err = encCon.Subscribe(route.Route, route.Handler)
+		route.Subsc, err = encCon.Subscribe(route.Route, route.Handler)
 		if err != nil {
 			return errors.New("Failed to make subcriptions for " + route.Route + ": " + err.Error())
 		}
