@@ -9,6 +9,7 @@ import (
 type Nats struct {
 	*nats.Options
 	routes []*Route
+	encCon *nats.EncodedConn
 }
 
 type OptionsFunc func(*Nats) error
@@ -61,13 +62,13 @@ func (n *Nats) ListenAndServe() error {
 		return err
 	}
 
-	encCon, err := nats.NewEncodedConn(con, "gob")
+	n.encCon, err = nats.NewEncodedConn(con, "gob")
 	if err != nil {
 		return err
 	}
 
 	for _, route := range n.routes {
-		route.Subsc, err = encCon.Subscribe(route.Route, route.Handler)
+		route.Subsc, err = n.encCon.Subscribe(route.Route, route.Handler)
 		if err != nil {
 			return errors.New("Failed to make subcriptions for " + route.Route + ": " + err.Error())
 		}
@@ -83,6 +84,10 @@ func (n *Nats) UnsubscribeAll() {
 	for _, route := range n.routes {
 		route.Subsc.Unsubscribe()
 	}
+}
+
+func (n *Nats) GetEncCon() *nats.EncodedConn{
+	return n.encCon
 }
 
 
