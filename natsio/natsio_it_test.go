@@ -11,6 +11,11 @@ type TestData struct {
 	Message string
 }
 
+const (
+	NatsImage = "nats"
+	NatsPort = "4222"
+)
+
 var (
 	dockCli *gDoc.Client
 	natsContainer *gDoc.Container
@@ -18,21 +23,18 @@ var (
 
 
 func setup(dockCli *gDoc.Client) *gDoc.Container {
-	err := dockCli.PullImage(gDoc.PullImageOptions{Repository: "nats", OutputStream: os.Stdout}, gDoc.AuthConfiguration{})
-	if err != nil {
+	if err := dockCli.PullImage(gDoc.PullImageOptions{Repository: NatsImage, OutputStream: os.Stdout}, gDoc.AuthConfiguration{}); err != nil {
 		panic("Failed to pull nats image:" + err.Error())
 	}
+
 	con, err := dockCli.CreateContainer(gDoc.CreateContainerOptions{
 		Config: &gDoc.Config{
-			Image: "nats",
+			Image: NatsImage,
 		},
 		HostConfig: &gDoc.HostConfig{
 			PortBindings: map[gDoc.Port][]gDoc.PortBinding{
-				"4222/tcp" : []gDoc.PortBinding{
-					gDoc.PortBinding{
-						HostIP: "127.0.0.1",
-						HostPort: "4222",
-					},
+				NatsPort + "/tcp" : []gDoc.PortBinding{
+					gDoc.PortBinding{HostIP: "127.0.0.1", HostPort: NatsPort},
 				},
 			},
 		},
@@ -79,7 +81,7 @@ func TestMain(m *testing.M) {
 
 func TestNewNatsConnect(t *testing.T) {
 	natsOpts := NewNats(func(n *Nats) error {
-		n.Url = "nats://localhost:4222"
+		n.Url = "nats://localhost:" + NatsPort
 		return nil
 	})
 
