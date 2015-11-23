@@ -11,6 +11,11 @@ type TestData struct {
 	Message string
 }
 
+var (
+	dockCli *gDoc.Client
+	natsContainer *gDoc.Container
+)
+
 
 func setup(dockCli *gDoc.Client) *gDoc.Container {
 	err := dockCli.PullImage(gDoc.PullImageOptions{Repository: "nats", OutputStream: os.Stdout}, gDoc.AuthConfiguration{})
@@ -43,10 +48,10 @@ func setup(dockCli *gDoc.Client) *gDoc.Container {
 	return con
 }
 
-func teardown(dockCli *gDoc.Client, natsCon *gDoc.Container) {
+func teardown() {
 	err := dockCli.RemoveContainer(gDoc.RemoveContainerOptions{
 		Force: true,
-		ID: natsCon.ID,
+		ID: natsContainer.ID,
 	})
 	if err != nil {
 		panic("Failed to remove nats container:" + err.Error())
@@ -56,17 +61,18 @@ func teardown(dockCli *gDoc.Client, natsCon *gDoc.Container) {
 func TestMain(m *testing.M) {
 	// your func
 
-	dockCli, err := gDoc.NewClientFromEnv()
+	var err error
+
+	dockCli, err = gDoc.NewClientFromEnv()
 	if err != nil {
 		panic("Failed to connect to docker:" + err.Error())
 	}
-	natsContainer := setup(dockCli)
+
+	natsContainer = setup(dockCli)
 
 	retCode := m.Run()
 
-	// your func
-	teardown(dockCli, natsContainer)
-
+	teardown()
 	// call with result of m.Run()
 	os.Exit(retCode)
 }
@@ -85,12 +91,14 @@ func TestNewNatsConnect(t *testing.T) {
 
 	err := natsOpts.ListenAndServe()
 	if err != nil {
+		teardown()
 		t.Error("Failed to connect:" + err.Error())
 	}
 
 	response := TestData{}
 	err = natsOpts.GetEncCon().Request("test.a", TestData{"Ping"}, response, 2 * time.Second)
 	if err != nil {
+		teardown()
 		t.Error("Failed to get response:" + err.Error())
 	}
 }
