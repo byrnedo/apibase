@@ -115,9 +115,9 @@ func TestNewNatsConnect(t *testing.T) {
 		return nil
 	})
 
-	var handler = func(reply string, testData *TestData) {
+	var handler = func(subj string, reply string, testData *TestData) {
 		t.Logf("Got message on nats: %+v", testData)
-
+		natsOpts.EncCon.Publish(reply, &TestData{Message: "Pong"})
 	}
 
 	natsOpts.HandleFunc("test.a", handler)
@@ -129,7 +129,7 @@ func TestNewNatsConnect(t *testing.T) {
 	}
 
 	response := TestData{}
-	encCon := natsOpts.GetEncCon()
+	encCon := natsOpts.EncCon
 	t.Logf("EncCon %+v", encCon)
 	err = encCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)
 	if err != nil {
