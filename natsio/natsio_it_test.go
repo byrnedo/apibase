@@ -117,6 +117,9 @@ func TestNewNatsConnect(t *testing.T) {
 
 	var handler = func(subj string, reply string, testData *TestData) {
 		t.Logf("Got message on nats: %+v", testData)
+		//EncCon is nil at this point but that's ok
+		//since it wont get called until after connecting
+		//when it will then get a ping message.
 		natsOpts.EncCon.Publish(reply, &TestData{Message: "Pong"})
 	}
 

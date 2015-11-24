@@ -6,6 +6,8 @@ import (
 	"errors"
 )
 
+// nats.Options wrapper.
+// TODO move state (EncCon) out of here
 type Nats struct {
 	*nats.Options
 	routes []*Route
@@ -14,6 +16,7 @@ type Nats struct {
 
 type OptionsFunc func(*Nats) error
 
+// Holds route info
 type Route struct {
 	Route   string
 	Handler nats.Handler
@@ -27,7 +30,8 @@ func prepend(slice []OptionsFunc, item OptionsFunc) []OptionsFunc{
 	return slice
 }
 
-// Initiating nats with default options
+// Initiating nats with default options and then applies each
+// option func in order on top of that.
 func NewNats(optionFuncs  ...OptionsFunc) (options *Nats) {
 	options = &Nats{}
 	options.setOptions(prepend(optionFuncs, setDefaultOptions)...)
@@ -42,6 +46,7 @@ func (n *Nats) setOptions(optionFuncs ...OptionsFunc) error {
 	}
 	return nil
 }
+
 func setDefaultOptions(options *Nats) error {
 	options.Options = &nats.DefaultOptions
 	options.MaxReconnect = 5
@@ -51,11 +56,12 @@ func setDefaultOptions(options *Nats) error {
 	return nil
 }
 
+// Like http.HandleFunc, give it a route and a handler (same as the normal nats subscribe)
 func (n *Nats) HandleFunc(route string, handler nats.Handler){
 	n.routes = append(n.routes, &Route{Route: route,Handler: handler, Subsc: nil})
 }
 
-// waits 1 second before trying again
+// waits 1 second before trying again <attempts> number of times
 func (n *Nats) ListenAndServeOrRetry(attempts int) error {
 	err := n.ListenAndServe()
 	if err != nil {
@@ -89,10 +95,12 @@ func (n *Nats) ListenAndServe() error {
 	return nil
 }
 
+// Get slice of Routes
 func (n *Nats) GetRoutes() []*Route{
 	return n.routes
 }
 
+// Unsubscribe all hanlders
 func (n *Nats) UnsubscribeAll() {
 	for _, route := range n.routes {
 		route.Subsc.Unsubscribe()
