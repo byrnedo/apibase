@@ -55,6 +55,19 @@ func (n *Nats) HandleFunc(route string, handler nats.Handler){
 	n.routes = append(n.routes, &Route{Route: route,Handler: handler, Subsc: nil})
 }
 
+// waits 1 second before trying again
+func (n *Nats) ListenAndServeOrRetry(attempts int) error {
+	err := n.ListenAndServe()
+	if err != nil {
+		if attempts == 1 {
+			return err
+		}
+		time.Sleep(1 * time.Second)
+		err = n.ListenAndServeOrRetry(attempts - 1)
+	}
+	return err
+}
+
 // Start subscribing to subjects/routes. This is non blocking.
 func (n *Nats) ListenAndServe() error {
 	con, err := n.Connect()

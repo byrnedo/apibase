@@ -14,21 +14,25 @@ type TestData struct {
 const (
 	NatsImage = "nats"
 	NatsPort = "4222"
+	NatsLabel = "APIBASE_NATSIO_TEST"
 )
 
 var (
 	dockCli *gDoc.Client
 	natsContainer *gDoc.Container
 )
+func startNatsContainer(dockCli *gDoc.Client) *gDoc.Container {
 
-
-func setup(dockCli *gDoc.Client) *gDoc.Container {
 	if err := dockCli.PullImage(gDoc.PullImageOptions{Repository: NatsImage, OutputStream: os.Stdout}, gDoc.AuthConfiguration{}); err != nil {
 		panic("Failed to pull nats image:" + err.Error())
 	}
 
 	con, err := dockCli.CreateContainer(gDoc.CreateContainerOptions{
 		Config: &gDoc.Config{
+			Cmd : []string{"--debug", "--logtime"},
+			Labels: map[string]string{
+				NatsLabel : "true",
+			},
 			Image: NatsImage,
 		},
 		HostConfig: &gDoc.HostConfig{
@@ -45,6 +49,33 @@ func setup(dockCli *gDoc.Client) *gDoc.Container {
 
 	if err := dockCli.StartContainer(con.ID, nil); err != nil {
 		panic("Failed to start nats container:" + err.Error())
+	}
+	return con
+}
+
+func runningNatsContainer(dockCli *gDoc.Client) *gDoc.Container {
+	cons, err :=dockCli.ListContainers(gDoc.ListContainersOptions{
+		Filters: map[string][]string{
+			"label":[]string{NatsLabel},
+		},
+	})
+	if err != nil {
+		panic("Error getting container:" + err.Error())
+	}
+
+	if len(cons) == 0 {
+		return nil
+	}
+	return &gDoc.Container{
+		ID : cons[0].ID,
+	}
+}
+
+func setup(dockCli *gDoc.Client) *gDoc.Container {
+	var con *gDoc.Container
+
+	if con = runningNatsContainer(dockCli); con ==  nil{
+		con = startNatsContainer(dockCli)
 	}
 
 	return con
@@ -74,7 +105,6 @@ func TestMain(m *testing.M) {
 
 	retCode := m.Run()
 
-	teardown()
 	// call with result of m.Run()
 	os.Exit(retCode)
 }
@@ -85,22 +115,25 @@ func TestNewNatsConnect(t *testing.T) {
 		return nil
 	})
 
-	var handler = func(testData *TestData) {
+	var handler = func(reply string, testData *TestData) {
 		t.Logf("Got message on nats: %+v", testData)
+
 	}
 
 	natsOpts.HandleFunc("test.a", handler)
 
-	err := natsOpts.ListenAndServe()
+	err := natsOpts.ListenAndServeOrRetry(3)
 	if err != nil {
-		teardown()
 		t.Error("Failed to connect:" + err.Error())
+		return
 	}
 
 	response := TestData{}
-	err = natsOpts.GetEncCon().Request("test.a", TestData{"Ping"}, response, 2 * time.Second)
+	encCon := natsOpts.GetEncCon()
+	t.Logf("EncCon %+v", encCon)
+	err = encCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)
 	if err != nil {
-		teardown()
 		t.Error("Failed to get response:" + err.Error())
+		return
 	}
 }
