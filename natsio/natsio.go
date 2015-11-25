@@ -6,14 +6,19 @@ import (
 	"errors"
 )
 
+type NatsOptions struct {
+	nats.Options
+	routes []*Route
+	encoding string
+}
+
 // nats.Options wrapper.
 type Nats struct {
-	Opts *nats.Options
-	routes []*Route
+	Opts *NatsOptions
 	EncCon *nats.EncodedConn
 }
 
-type OptionsFunc func(*nats.Options) error
+type OptionsFunc func(*NatsOptions) error
 
 // Holds route info
 type Route struct {
@@ -31,22 +36,28 @@ func prepend(slice []OptionsFunc, item OptionsFunc) []OptionsFunc{
 
 // Initiating nats with default options and then applies each
 // option func in order on top of that.
-func NewNats(optionFuncs  ...OptionsFunc) (options *Nats) {
-	options = &Nats{Opts: &nats.DefaultOptions}
+func NewNatsOptions(optionFuncs  ...OptionsFunc) (options *NatsOptions) {
+	options = &NatsOptions{Options: nats.DefaultOptions}
 	options.setOptions(prepend(optionFuncs, setDefaultOptions)...)
 	return
 }
 
-func (n *Nats) setOptions(optionFuncs ...OptionsFunc) error {
+func (n *NatsOptions) SetEncoding(enc string){
+	n.encoding = enc
+}
+
+
+func (n *NatsOptions) setOptions(optionFuncs ...OptionsFunc) error {
 	for _, opt := range optionFuncs {
-		if err := opt(n.Opts); err != nil {
+		if err := opt(n); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func setDefaultOptions(options *nats.Options) error {
+func setDefaultOptions(options *NatsOptions) error {
+	options.encoding = nats.DEFAULT_ENCODER
 	options.MaxReconnect = 5
 	options.ReconnectWait = (2 * time.Second)
 	options.Timeout = (10 * time.Second)
@@ -55,52 +66,54 @@ func setDefaultOptions(options *nats.Options) error {
 }
 
 // Like http.HandleFunc, give it a route and a handler (same as the normal nats subscribe)
-func (n *Nats) HandleFunc(route string, handler nats.Handler){
+func (n *NatsOptions) HandleFunc(route string, handler nats.Handler){
 	n.routes = append(n.routes, &Route{Route: route,Handler: handler, Subsc: nil})
 }
 
 // waits 1 second before trying again <attempts> number of times
-func (n *Nats) ListenAndServeOrRetry(attempts int) error {
-	err := n.ListenAndServe()
+func (n *NatsOptions) ListenAndServeOrRetry(attempts int) (natsObj *Nats,err error) {
+	natsObj,err = n.ListenAndServe()
 	if err != nil {
 		if attempts == 1 {
-			return err
+			return
 		}
 		time.Sleep(1 * time.Second)
-		err = n.ListenAndServeOrRetry(attempts - 1)
+		natsObj, err = n.ListenAndServeOrRetry(attempts - 1)
 	}
-	return err
+	return
 }
 
 // Start subscribing to subjects/routes. This is non blocking.
-func (n *Nats) ListenAndServe() error {
-	con, err := n.Opts.Connect()
+func (natsOpts *NatsOptions) ListenAndServe() (natsObj *Nats, err error) {
+	con, err := natsOpts.Connect()
 	if err != nil {
-		return err
+		return
 	}
 
-	n.EncCon, err = nats.NewEncodedConn(con, "gob")
+	natsObj = &Nats{Opts : natsOpts}
+
+	natsObj.EncCon, err = nats.NewEncodedConn(con, natsOpts.encoding)
 	if err != nil {
-		return err
+		return
 	}
 
-	for _, route := range n.routes {
-		route.Subsc, err = n.EncCon.Subscribe(route.Route, route.Handler)
+	for _, route := range natsOpts.routes {
+		route.Subsc, err = natsObj.EncCon.Subscribe(route.Route, route.Handler)
 		if err != nil {
-			return errors.New("Failed to make subcriptions for " + route.Route + ": " + err.Error())
+			return natsObj, errors.New("Failed to make subcriptions for " + route.Route + ": " + err.Error())
 		}
 	}
-	return nil
+	return
 }
 
 // Get slice of Routes
-func (n *Nats) GetRoutes() []*Route{
+func (n *NatsOptions) GetRoutes() []*Route{
 	return n.routes
 }
 
 // Unsubscribe all handlers
 func (n *Nats) UnsubscribeAll() {
-	for _, route := range n.routes {
+	for _, route := range n.Opts.routes {
 		route.Subsc.Unsubscribe()
 	}
 }

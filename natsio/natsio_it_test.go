@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 	"time"
-"github.com/apcera/nats"
 )
 
 type TestData struct {
@@ -113,31 +112,33 @@ func TestMain(m *testing.M) {
 func TestNewNatsConnect(t *testing.T) {
 	natsOpts := setupConnection()
 
+	var natsCon *Nats
+
 	var handler = func(subj string, reply string, testData *TestData) {
 		t.Logf("Got message on nats: %+v", testData)
 		//EncCon is nil at this point but that's ok
 		//since it wont get called until after connecting
 		//when it will then get a ping message.
-		natsOpts.EncCon.Publish(reply, &TestData{Message: "Pong"})
+		natsCon.EncCon.Publish(reply, &TestData{Message: "Pong"})
 	}
 
 	natsOpts.HandleFunc("test.a", handler)
 
-	err := natsOpts.ListenAndServeOrRetry(3)
+	natsCon, err := natsOpts.ListenAndServeOrRetry(3)
 	if err != nil {
 		t.Error("Failed to connect:" + err.Error())
 		return
 	}
 
 	response := TestData{}
-	err = natsOpts.EncCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)
+	err = natsCon.EncCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)
 	if err != nil {
 		t.Error("Failed to get response:" + err.Error())
 		return
 	}
 
-	natsOpts.UnsubscribeAll()
-	err = natsOpts.EncCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)
+	natsCon.UnsubscribeAll()
+	err = natsCon.EncCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)
 	if err == nil {
 		t.Error("Should have failed to get response")
 		return
@@ -145,10 +146,11 @@ func TestNewNatsConnect(t *testing.T) {
 }
 
 
-func setupConnection() *Nats{
+func setupConnection() *NatsOptions{
 
-	return NewNats(func(n *nats.Options) error {
+	return NewNatsOptions(func(n *NatsOptions) error {
 		n.Url = "nats://localhost:" + NatsPort
+		n.SetEncoding("gob")
 		return nil
 	})
 

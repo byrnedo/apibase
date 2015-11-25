@@ -6,30 +6,30 @@ import (
 )
 
 func Test_NewNatsOptionsAppliedInOrder(t *testing.T) {
-	var nats = NewNats(func(n *nats.Options) error {
+	var natsOpts = NewNatsOptions(func(n *NatsOptions) error {
 		n.Url = "test"
 		n.MaxPingsOut = 4
 		return nil
-	}, func(n *nats.Options) error {
+	}, func(n *NatsOptions) error {
 		n.Url = "test2"
 		n.MaxPingsOut = 5
 		return nil
 	})
 
-	if nats.Opts.Url != "test2" || nats.Opts.MaxPingsOut != 5 {
+	if natsOpts.Url != "test2" || natsOpts.MaxPingsOut != 5 {
 		t.Error("Options not applied in correct order")
 	}
 }
 
 func Test_NewNatsDefaultOptionsApplied(t *testing.T) {
-	var nats = NewNats()
-	if nats.Opts.NoRandomize != true {
+	var natsOpts = NewNatsOptions()
+	if natsOpts.NoRandomize != true {
 		t.Error("Default options were not applied")
 	}
 }
 
 func Test_HandleFunc(t *testing.T) {
-	var natsOpts = NewNats()
+	var natsOpts = NewNatsOptions()
 
 	var handleFunc1 = func(n *nats.Msg) {}
 	var handleFunc2 = func(n *nats.Msg) {}
