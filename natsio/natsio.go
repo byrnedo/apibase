@@ -7,14 +7,13 @@ import (
 )
 
 // nats.Options wrapper.
-// TODO move state (EncCon) out of here
 type Nats struct {
-	*nats.Options
+	Opts *nats.Options
 	routes []*Route
 	EncCon *nats.EncodedConn
 }
 
-type OptionsFunc func(*Nats) error
+type OptionsFunc func(*nats.Options) error
 
 // Holds route info
 type Route struct {
@@ -33,22 +32,21 @@ func prepend(slice []OptionsFunc, item OptionsFunc) []OptionsFunc{
 // Initiating nats with default options and then applies each
 // option func in order on top of that.
 func NewNats(optionFuncs  ...OptionsFunc) (options *Nats) {
-	options = &Nats{}
+	options = &Nats{Opts: &nats.DefaultOptions}
 	options.setOptions(prepend(optionFuncs, setDefaultOptions)...)
 	return
 }
 
 func (n *Nats) setOptions(optionFuncs ...OptionsFunc) error {
 	for _, opt := range optionFuncs {
-		if err := opt(n); err != nil {
+		if err := opt(n.Opts); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func setDefaultOptions(options *Nats) error {
-	options.Options = &nats.DefaultOptions
+func setDefaultOptions(options *nats.Options) error {
 	options.MaxReconnect = 5
 	options.ReconnectWait = (2 * time.Second)
 	options.Timeout = (10 * time.Second)
@@ -76,7 +74,7 @@ func (n *Nats) ListenAndServeOrRetry(attempts int) error {
 
 // Start subscribing to subjects/routes. This is non blocking.
 func (n *Nats) ListenAndServe() error {
-	con, err := n.Connect()
+	con, err := n.Opts.Connect()
 	if err != nil {
 		return err
 	}
@@ -100,7 +98,7 @@ func (n *Nats) GetRoutes() []*Route{
 	return n.routes
 }
 
-// Unsubscribe all hanlders
+// Unsubscribe all handlers
 func (n *Nats) UnsubscribeAll() {
 	for _, route := range n.routes {
 		route.Subsc.Unsubscribe()

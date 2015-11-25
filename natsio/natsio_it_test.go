@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 	"time"
+"github.com/apcera/nats"
 )
 
 type TestData struct {
@@ -110,10 +111,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestNewNatsConnect(t *testing.T) {
-	natsOpts := NewNats(func(n *Nats) error {
-		n.Url = "nats://localhost:" + NatsPort
-		return nil
-	})
+	natsOpts := setupConnection()
 
 	var handler = func(subj string, reply string, testData *TestData) {
 		t.Logf("Got message on nats: %+v", testData)
@@ -132,11 +130,26 @@ func TestNewNatsConnect(t *testing.T) {
 	}
 
 	response := TestData{}
-	encCon := natsOpts.EncCon
-	t.Logf("EncCon %+v", encCon)
-	err = encCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)
+	err = natsOpts.EncCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)
 	if err != nil {
 		t.Error("Failed to get response:" + err.Error())
 		return
 	}
+
+	natsOpts.UnsubscribeAll()
+	err = natsOpts.EncCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)
+	if err == nil {
+		t.Error("Should have failed to get response")
+		return
+	}
+}
+
+
+func setupConnection() *Nats{
+
+	return NewNats(func(n *nats.Options) error {
+		n.Url = "nats://localhost:" + NatsPort
+		return nil
+	})
+
 }

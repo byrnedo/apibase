@@ -6,24 +6,24 @@ import (
 )
 
 func Test_NewNatsOptionsAppliedInOrder(t *testing.T) {
-	var natsOpts = NewNats(func(n *Nats) error {
+	var nats = NewNats(func(n *nats.Options) error {
 		n.Url = "test"
 		n.MaxPingsOut = 4
 		return nil
-	}, func(n *Nats) error {
+	}, func(n *nats.Options) error {
 		n.Url = "test2"
 		n.MaxPingsOut = 5
 		return nil
 	})
 
-	if natsOpts.Url != "test2" || natsOpts.MaxPingsOut != 5 {
+	if nats.Opts.Url != "test2" || nats.Opts.MaxPingsOut != 5 {
 		t.Error("Options not applied in correct order")
 	}
 }
 
 func Test_NewNatsDefaultOptionsApplied(t *testing.T) {
-	var natsOpts = NewNats()
-	if natsOpts.NoRandomize != true {
+	var nats = NewNats()
+	if nats.Opts.NoRandomize != true {
 		t.Error("Default options were not applied")
 	}
 }
