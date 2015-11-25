@@ -114,6 +114,14 @@ func TestNewNatsConnect(t *testing.T) {
 
 	var natsCon *Nats
 
+
+
+	natsCon, err := natsOpts.ConnectOrRetry(3)
+	if err != nil {
+		t.Error("Failed to connect:" + err.Error())
+		return
+	}
+
 	var handler = func(subj string, reply string, testData *TestData) {
 		t.Logf("Got message on nats: %+v", testData)
 		//EncCon is nil at this point but that's ok
@@ -122,13 +130,7 @@ func TestNewNatsConnect(t *testing.T) {
 		natsCon.EncCon.Publish(reply, &TestData{Message: "Pong"})
 	}
 
-	natsOpts.HandleFunc("test.a", handler)
-
-	natsCon, err := natsOpts.ListenAndServeOrRetry(3)
-	if err != nil {
-		t.Error("Failed to connect:" + err.Error())
-		return
-	}
+	natsCon.HandleFunc("test.a", handler)
 
 	response := TestData{}
 	err = natsCon.EncCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)

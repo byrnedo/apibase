@@ -66,26 +66,31 @@ func setDefaultOptions(options *NatsOptions) error {
 }
 
 // Like http.HandleFunc, give it a route and a handler (same as the normal nats subscribe)
-func (n *NatsOptions) HandleFunc(route string, handler nats.Handler){
-	n.routes = append(n.routes, &Route{Route: route,Handler: handler, Subsc: nil})
+func (n *Nats) HandleFunc(route string, handler nats.Handler) error{
+	subsc, err :=  n.EncCon.Subscribe(route, handler)
+	if err != nil {
+		return errors.New("Failed to make subcriptions for " + route + ": " + err.Error())
+	}
+	n.Opts.routes = append(n.Opts.routes, &Route{Route: route,Handler: handler, Subsc: subsc})
+	return nil
 }
 
 // waits 1 second before trying again <attempts> number of times
-func (n *NatsOptions) ListenAndServeOrRetry(attempts int) (natsObj *Nats,err error) {
-	natsObj,err = n.ListenAndServe()
+func (n *NatsOptions) ConnectOrRetry(attempts int) (natsObj *Nats,err error) {
+	natsObj,err = n.Connect()
 	if err != nil {
 		if attempts == 1 {
 			return
 		}
 		time.Sleep(1 * time.Second)
-		natsObj, err = n.ListenAndServeOrRetry(attempts - 1)
+		natsObj, err = n.ConnectOrRetry(attempts - 1)
 	}
 	return
 }
 
 // Start subscribing to subjects/routes. This is non blocking.
-func (natsOpts *NatsOptions) ListenAndServe() (natsObj *Nats, err error) {
-	con, err := natsOpts.Connect()
+func (natsOpts *NatsOptions) Connect() (natsObj *Nats, err error) {
+	con, err := natsOpts.Options.Connect()
 	if err != nil {
 		return
 	}
@@ -93,16 +98,6 @@ func (natsOpts *NatsOptions) ListenAndServe() (natsObj *Nats, err error) {
 	natsObj = &Nats{Opts : natsOpts}
 
 	natsObj.EncCon, err = nats.NewEncodedConn(con, natsOpts.encoding)
-	if err != nil {
-		return
-	}
-
-	for _, route := range natsOpts.routes {
-		route.Subsc, err = natsObj.EncCon.Subscribe(route.Route, route.Handler)
-		if err != nil {
-			return natsObj, errors.New("Failed to make subcriptions for " + route.Route + ": " + err.Error())
-		}
-	}
 	return
 }
 
