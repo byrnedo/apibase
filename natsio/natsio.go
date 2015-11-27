@@ -22,9 +22,26 @@ type OptionsFunc func(*NatsOptions) error
 
 // Holds route info
 type Route struct {
-	Route   string
-	Handler nats.Handler
-	Subsc   *nats.Subscription
+	route      string
+	handler    nats.Handler
+	subsc      *nats.Subscription
+	queueGroup string
+}
+
+func (r *Route) GetRoute() string {
+	return r.route
+}
+
+func (r *Route) GetHandler() nats.Handler {
+	return r.handler
+}
+
+func (r *Route) GetSubscription() nats.Handler {
+	return r.subsc
+}
+
+func (r *Route) GetQueueGroup() string {
+	return r.queueGroup
 }
 
 func prepend(slice []OptionsFunc, item OptionsFunc) []OptionsFunc{
@@ -66,12 +83,22 @@ func setDefaultOptions(options *NatsOptions) error {
 }
 
 // Like http.HandleFunc, give it a route and a handler (same as the normal nats subscribe)
-func (n *Nats) HandleFunc(route string, handler nats.Handler) error{
+func (n *Nats) Subscribe(route string, handler nats.Handler) error{
 	subsc, err :=  n.EncCon.Subscribe(route, handler)
 	if err != nil {
 		return errors.New("Failed to make subcriptions for " + route + ": " + err.Error())
 	}
-	n.Opts.routes = append(n.Opts.routes, &Route{Route: route,Handler: handler, Subsc: subsc})
+	n.Opts.routes = append(n.Opts.routes, &Route{route: route, handler: handler, subsc: subsc})
+	return nil
+}
+
+// Like http.HandleFunc, give it a route and a handler (same as the normal nats subscribe)
+func (n *Nats) QueueSubscribe(route string, group string, handler nats.Handler) error{
+	subsc, err :=  n.EncCon.QueueSubscribe(route, group, handler)
+	if err != nil {
+		return errors.New("Failed to make subcriptions for " + route + ": " + err.Error())
+	}
+	n.Opts.routes = append(n.Opts.routes, &Route{route: route, handler: handler, subsc: subsc, queueGroup: group})
 	return nil
 }
 
@@ -109,7 +136,7 @@ func (n *NatsOptions) GetRoutes() []*Route{
 // Unsubscribe all handlers
 func (n *Nats) UnsubscribeAll() {
 	for _, route := range n.Opts.routes {
-		route.Subsc.Unsubscribe()
+		route.subsc.Unsubscribe()
 	}
 }
 
