@@ -18,9 +18,13 @@ type Nats struct {
 	EncCon *nats.EncodedConn
 }
 
+// Function for applying options to NatsOptions in NewNatsOptions
+// Using a function allows for a chain or heirarchy when applying them
+// eg func1 then func2 then func3
+// Internally allows for default options to be applied first.
 type OptionsFunc func(*NatsOptions) error
 
-// Holds route info
+// Holds route info including subscription
 type Route struct {
 	route      string
 	handler    nats.Handler
@@ -82,7 +86,7 @@ func setDefaultOptions(options *NatsOptions) error {
 	return nil
 }
 
-// Like http.HandleFunc, give it a route and a handler (same as the normal nats subscribe)
+// Subscribe and record subscription to routes
 func (n *Nats) Subscribe(route string, handler nats.Handler) error{
 	subsc, err :=  n.EncCon.Subscribe(route, handler)
 	if err != nil {
@@ -92,7 +96,7 @@ func (n *Nats) Subscribe(route string, handler nats.Handler) error{
 	return nil
 }
 
-// Like http.HandleFunc, give it a route and a handler (same as the normal nats subscribe)
+// Subscribe to queue group and record subscription to routes
 func (n *Nats) QueueSubscribe(route string, group string, handler nats.Handler) error{
 	subsc, err :=  n.EncCon.QueueSubscribe(route, group, handler)
 	if err != nil {
