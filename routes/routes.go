@@ -30,6 +30,7 @@ func (n *NatsRoute) GetHandler() nats.Handler {
 	return n.handler
 }
 
+
 type HttpMethod string
 
 const(

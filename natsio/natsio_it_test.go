@@ -15,7 +15,7 @@ type TestData struct {
 
 const (
 	NatsImage = "nats"
-	NatsPort = "4222"
+	NatsPort = "4223"
 	NatsLabel = "APIBASE_NATSIO_TEST"
 )
 
@@ -39,7 +39,7 @@ func startNatsContainer(dockCli *gDoc.Client) *gDoc.Container {
 		},
 		HostConfig: &gDoc.HostConfig{
 			PortBindings: map[gDoc.Port][]gDoc.PortBinding{
-				NatsPort + "/tcp" : []gDoc.PortBinding{
+				 "4222/tcp" : []gDoc.PortBinding{
 					gDoc.PortBinding{HostIP: "127.0.0.1", HostPort: NatsPort},
 				},
 			},
