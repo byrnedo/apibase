@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	PostgresImage = "postgres"
+	PostgresImage = "postgres:9.4"
 	PostgresPort = "5442"
 	PostgresLabel = "APIBASE_POSTGRES_TEST"
 	PostgresPassword = "mysecretpassword"
@@ -60,6 +60,11 @@ func TestConnectAndQuery(t *testing.T) {
 
 	if DB == nil {
 		t.Error("DB was nil, not good.")
+	}
+
+	_, err = DB.SQL("select $1", 1).Exec()
+	if err != nil {
+		t.Error("Failed to do select: ",err.Error())
 	}
 
 

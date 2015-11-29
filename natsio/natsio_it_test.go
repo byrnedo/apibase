@@ -14,7 +14,7 @@ type TestData struct {
 }
 
 const (
-	NatsImage = "nats"
+	NatsImage = "nats:latest"
 	NatsPort = "4223"
 	NatsLabel = "APIBASE_NATSIO_TEST"
 )
