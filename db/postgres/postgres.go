@@ -48,16 +48,17 @@ func Init(confFunc func(conf *Config)) {
 
 	conf := newDefaultConfig(confFunc)
 
-	if conf.Cache != nil {
-		if store := conf.Cache.GetStore(); store != nil {
-			runner.SetCache(store)
-		}
-	}
 
 	// create a normal database connection through database/sql
 	db, err := sql.Open("postgres", conf.ConnectString)
 	if err != nil {
 		panic(err)
+	}
+
+	if conf.Cache != nil {
+		if store := conf.Cache.GetStore(); store != nil {
+			runner.SetCache(store)
+		}
 	}
 
 	// ensures the database can be pinged with an exponential backoff (15 min)

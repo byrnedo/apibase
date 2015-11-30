@@ -55,7 +55,7 @@ func TestConnectAndQuery(t *testing.T) {
 
 	}()
 	Init(func(c *Config) {
-		c.ConnectString = "dbname=postgres user=postgres password=" + PostgresPassword + " host=localhost port=" + PostgresPort + " sslmode=disable"
+		c.ConnectString = "dbname=postgres user=postgres password=" + PostgresPassword + " host=localhost port=" + PostgresPort + " sslmode=disable connect_timeout=5"
 	})
 
 	if DB == nil {
