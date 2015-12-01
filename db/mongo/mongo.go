@@ -51,11 +51,10 @@ func mgoSelect(fields ...string) (selBson bson.M) {
 
 // GetAll retrieves all records matches certain condition. Returns empty list if
 // no records exist
-func GetAll(table string,
+func GetAll(c *mgo.Collection,
 			query map[string]string, // TODO
 			fields []string,
- 			sortby []string,
-			order []string,
+ 			sortBy []string,
 			offset int,
 			limit int,
 			result interface{}) (err error) {
@@ -63,43 +62,6 @@ func GetAll(table string,
 	resultv := reflect.ValueOf(result)
 	if resultv.Kind() != reflect.Ptr || resultv.Elem().Kind() != reflect.Slice {
 		panic("result argument must be a slice address")
-	}
-
-	mConn := Conn()
-	defer mConn.Close()
-	c := mConn.DB("").C(table)
-
-	// order by:
-	var sortFields []string
-	if len(sortby) != 0 {
-		if len(sortby) == len(order) {
-			// 1) for each sort field, there is an associated order
-			for i, v := range sortby {
-				orderby := ""
-				if order[i] == "desc" {
-					orderby = "-" + v
-				} else if order[i] == "asc" {
-					orderby = v
-				} else {
-					return errors.New("Error: Invalid order. Must be either [asc|desc]")
-				}
-				sortFields = append(sortFields, orderby)
-			}
-			//qs = qs.OrderBy(sortFields...)
-		} else if len(sortby) != len(order) && len(order) > 0 {
-			// 2) there is exactly one order, all the sorted fields will be sorted by this order
-			for _, v := range sortby {
-				orderby := ""
-				if order[0] == "desc" {
-					orderby = "-" + v
-				} else if order[0] == "asc" {
-					orderby = v
-				} else {
-					return errors.New("Error: Invalid order. Must be either [asc|desc]")
-				}
-				sortFields = append(sortFields, orderby)
-			}
-		}
 	}
 
 	moddedQuery := make(map[string]interface{})
@@ -119,7 +81,7 @@ func GetAll(table string,
 		}
 	}
 
-	err = c.Find(moddedQuery).Select(mgoSelect(fields...)).Skip(offset).Limit(limit).Sort(sortFields...).All(result)
+	err = c.Find(moddedQuery).Select(mgoSelect(fields...)).Skip(offset).Limit(limit).Sort(sortBy...).All(result)
 
 	return
 }
