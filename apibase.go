@@ -5,48 +5,54 @@ import (
 	"fmt"
 	"github.com/byrnedo/apibase/config"
 	. "github.com/byrnedo/apibase/logger"
-	"io/ioutil"
 	"os"
+	"io"
 )
 
 var (
 	Conf config.Config
-	configFile  string
-	logFilePath string
-	showUsage   bool
 )
 
-func createLogger(logFilePath string) {
-
+func createLogger(logFilePath string, logLevel LogLevel ) {
 	var (
-		logOpts *LogOptions
+		logWriter io.Writer
+		errLogWriter io.Writer
 	)
 
-	if len(logFilePath) > 0 {
-		file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-		if err != nil {
-			panic("Failed to open log file " + logFilePath + ":" + err.Error())
-		}
-		defer file.Close()
-		logOpts = &LogOptions{
-			TraceHandle:   ioutil.Discard,
-			InfoHandle:    file,
-			WarningHandle: file,
-			ErrorHandle:   file,
-		}
-	} else {
-		logOpts = &LogOptions{
-			TraceHandle:   ioutil.Discard,
-			InfoHandle:    os.Stdout,
-			WarningHandle: os.Stdout,
-			ErrorHandle:   os.Stderr,
-		}
-	}
-	InitLog(*logOpts)
+	InitLog(func(logOpts *LogOptions){
 
+		logOpts.Level = logLevel
+		if len(logFilePath) > 0 {
+			file, err := os.OpenFile(logFilePath, os.O_CREATE | os.O_WRONLY | os.O_APPEND, 0666)
+			if err != nil {
+				panic("Failed to open log file " + logFilePath + ":" + err.Error())
+			}
+			logWriter = file
+			errLogWriter = file
+			defer file.Close()
+		} else {
+			logWriter = os.Stdout
+			errLogWriter = os.Stderr
+		}
+
+
+		logOpts.TraceHandle = logWriter
+		logOpts.InfoHandle = logWriter
+		logOpts.WarningHandle = logWriter
+		logOpts.ErrorHandle = errLogWriter
+
+	})
 }
 
 func Init() {
+
+	var (
+		configFile  string
+		logFilePath string
+		logLevel LogLevel
+		showUsage   bool
+	)
+
 	flag.StringVar(&configFile, "conf", "", "Configuration file path")
 	flag.BoolVar(&showUsage, "help", false, "Show usage information")
 	flag.Parse()
@@ -67,9 +73,20 @@ func Init() {
 		os.Exit(1)
 	}
 
-	if logFilePath, err = Conf.GetString("log-file"); err != nil {
+	if logFilePath, err = Conf.GetString("log.file"); err != nil {
 		fmt.Println("No log-file config var, logging to std out/err")
 	}
 
-	createLogger(logFilePath)
+	switch Conf.GetDefaultString("log.level", "info") {
+	case "trace":
+		logLevel = TraceLevel
+	case "info":
+		logLevel = InfoLevel
+	case "warn":
+		logLevel = WarnLevel
+	case "error":
+		logLevel = ErrorLevel
+	}
+
+	createLogger(logFilePath, logLevel)
 }

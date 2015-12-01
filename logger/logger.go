@@ -3,6 +3,8 @@ package logger
 import (
 	"io"
 	"log"
+	"io/ioutil"
+	"os"
 )
 
 var (
@@ -16,11 +18,21 @@ var (
 	logFormat int = log.Ldate | log.Ltime | log.Lshortfile
 )
 
+type LogLevel int
+
+const (
+	TraceLevel LogLevel = 0
+	InfoLevel LogLevel = 1
+	WarnLevel LogLevel = 2
+	ErrorLevel LogLevel = 3
+)
+
 func GetLogOptions() LogOptions {
 	return *baseOptions
 }
 
 type LogOptions struct {
+	Level         LogLevel
 	TraceHandle   io.Writer
 	TraceFormat   int
 	InfoHandle    io.Writer
@@ -32,26 +44,32 @@ type LogOptions struct {
 }
 
 func (options *LogOptions) seedDefaults() {
-	if options.TraceFormat == 0 {
-		options.TraceFormat = logFormat
-	}
-
-	if options.InfoFormat == 0 {
-		options.InfoFormat = logFormat
-	}
-
-	if options.WarningFormat == 0 {
-		options.WarningFormat = logFormat
-	}
-
-	if options.ErrorFormat == 0 {
-		options.ErrorFormat = logFormat
-	}
+	options.Level = InfoLevel
+	options.TraceFormat = logFormat
+	options.InfoFormat = logFormat
+	options.InfoHandle = os.Stdout
+	options.WarningFormat = logFormat
+	options.WarningHandle = os.Stdout
+	options.ErrorFormat = logFormat
+	options.ErrorHandle = os.Stderr
 }
 
-func InitLog(options LogOptions){
+func InitLog(optFunc func(*LogOptions)) {
+	var options = &LogOptions{}
 	options.seedDefaults()
-	baseOptions = &options
+	optFunc(options)
+
+	if options.Level > TraceLevel {
+		options.TraceHandle = ioutil.Discard
+	}
+
+	if options.Level > InfoLevel {
+		options.InfoHandle = ioutil.Discard
+	}
+
+	if options.Level > InfoLevel {
+		options.WarningHandle = ioutil.Discard
+	}
 
 	Trace = log.New(options.TraceHandle,
 		"TRACE: ",
