@@ -28,7 +28,7 @@ func Init(url string, debugLog *log.Logger) {
 		mgo.SetLogger(debugLog)
 	}
 
-	Info.Println("Attempting to connect to [" + url + "]")
+	Info.Println("Attempting to connect to [" + url + "]\n")
 
 	sess, err := mgo.Dial(url)
 	if err != nil {
