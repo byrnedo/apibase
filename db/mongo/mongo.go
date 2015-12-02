@@ -1,7 +1,6 @@
 package mongo
 
 import (
-	"errors"
 	"log"
 	"reflect"
 	"strings"
@@ -40,8 +39,7 @@ func Init(url string, debugLog *log.Logger) {
 }
 
 // Makes a bson map out of a list of fields
-func mgoSelect(fields ...string) (selBson bson.M) {
-
+func ToBsonMap(fields ...string) (selBson bson.M) {
 	selBson = make(bson.M, len(fields))
 	for _, s := range fields {
 		selBson[s] = 1
@@ -49,39 +47,45 @@ func mgoSelect(fields ...string) (selBson bson.M) {
 	return
 }
 
+func ConvertObjectIds(query map[string]interface{}) {
+	for index, qVal := range query {
+		// Chanage the json 'id' into mongo '_id'
+		if index == "id" {
+			index = "_id"
+		}
+		if strings.HasSuffix(index, "_id") {
+			switch query[index].(type){
+			case string:
+				var strVal = qVal.(string)
+				if bson.IsObjectIdHex(strVal) {
+					query[index] = bson.ObjectIdHex(strVal)
+				}
+			}
+		}
+	}
+}
+
 // GetAll retrieves all records matches certain condition. Returns empty list if
 // no records exist
 func GetAll(c *mgo.Collection,
-			query map[string]string, // TODO
-			fields []string,
- 			sortBy []string,
-			offset int,
-			limit int,
-			result interface{}) (err error) {
+query map[string]interface{}, // TODO
+fields []string,
+sortBy []string,
+offset int,
+limit int,
+result interface{}) (err error) {
 
 	resultv := reflect.ValueOf(result)
 	if resultv.Kind() != reflect.Ptr || resultv.Elem().Kind() != reflect.Slice {
 		panic("result argument must be a slice address")
 	}
 
-	moddedQuery := make(map[string]interface{})
 	// change the ids to be object ids before we go
 	if len(query) != 0 {
-		for index, qVal := range query {
-			// Chanage the json 'id' into mongo '_id'
-			if index == "id" {
-				index = "_id"
-			}
-			if strings.HasSuffix(index, "_id") && bson.IsObjectIdHex(qVal) {
-				moddedQuery[index] = bson.ObjectIdHex(qVal)
-			} else {
-				moddedQuery[index] = qVal
-			}
-
-		}
+		ConvertObjectIds(query)
 	}
 
-	err = c.Find(moddedQuery).Select(mgoSelect(fields...)).Skip(offset).Limit(limit).Sort(sortBy...).All(result)
+	err = c.Find(query).Select(ToBsonMap(fields...)).Skip(offset).Limit(limit).Sort(sortBy...).All(result)
 
 	return
 }
