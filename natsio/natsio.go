@@ -1,9 +1,8 @@
 package natsio
 
 import (
-	"github.com/apcera/nats"
-	"time"
 	"errors"
+"github.com/apcera/nats"
 )
 
 // nats.Options wrapper.
