@@ -7,19 +7,20 @@ import (
 	. "github.com/byrnedo/apibase/logger"
 	"os"
 	"io"
+	"github.com/byrnedo/typesafe-config/parse"
 )
 
 var (
-	Conf config.Config
+	Conf *parse.Config
 )
 
-func createLogger(logFilePath string, logLevel LogLevel ) {
+func createLogger(logFilePath string, logLevel LogLevel) {
 	var (
 		logWriter io.Writer
 		errLogWriter io.Writer
 	)
 
-	InitLog(func(logOpts *LogOptions){
+	InitLog(func(logOpts *LogOptions) {
 
 		logOpts.Level = logLevel
 		if len(logFilePath) > 0 {
@@ -47,10 +48,10 @@ func createLogger(logFilePath string, logLevel LogLevel ) {
 func Init() {
 
 	var (
-		configFile  string
+		configFile string
 		logFilePath string
 		logLevel LogLevel
-		showUsage   bool
+		showUsage bool
 	)
 
 	flag.StringVar(&configFile, "conf", "", "Configuration file path")
@@ -66,18 +67,19 @@ func Init() {
 		os.Exit(1)
 	}
 
-	Conf = config.Config{}
-	err := Conf.ParseFile(configFile)
+	tree, err := config.ParseFile(configFile)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error parsing config file:"+err.Error())
+		fmt.Fprintln(os.Stderr, "Error parsing config file:" + err.Error())
 		os.Exit(1)
 	}
+	Conf = tree.GetConfig()
 
 	if logFilePath, err = Conf.GetString("log.file"); err != nil {
 		fmt.Println("No log-file config var, logging to std out/err")
 	}
 
-	switch Conf.GetDefaultString("log.level", "info") {
+	lvl := Conf.GetDefaultString("log.level", "info")
+	switch lvl {
 	case "trace":
 		logLevel = TraceLevel
 	case "info":
@@ -86,6 +88,8 @@ func Init() {
 		logLevel = WarnLevel
 	case "error":
 		logLevel = ErrorLevel
+	default:
+		panic("Unknown log level given:" + lvl)
 	}
 
 	createLogger(logFilePath, logLevel)

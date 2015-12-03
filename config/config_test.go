@@ -2,25 +2,27 @@ package config
 
 import (
 	"testing"
+"github.com/byrnedo/typesafe-config/parse"
 )
 
 func TestParse(t *testing.T) {
-	conf := Config{}
+	var (
+		tree *parse.Tree
+		err error
+	)
 
-	t.Logf("Conf object before: %v", conf)
-
-	if err := conf.ParseFile("./test.conf"); err != nil {
+	if tree, err = ParseFile("./test.conf"); err != nil {
 		t.Error("Failed to read ../test.conf:" + err.Error())
 	}
 
-	if conf.GetInt("http.port") != 1234 {
+	if val, err := tree.GetConfig().GetInt("http.port"); err != nil || val != 1234 {
 		t.Error("Incorrect Port value")
 	}
 
-	if conf.GetString("http.host") != "abcdef" {
+	if val, err := tree.GetConfig().GetString("http.host"); err != nil || val != "abcdef" {
 		t.Error("Incorrect Url value")
 	}
 
-	t.Logf("Conf object after: %v", conf)
+	t.Logf("Conf object after: %v", tree.GetConfig())
 
 }
