@@ -6,85 +6,12 @@ import (
 	"errors"
 )
 
-type NatsOptions struct {
-	nats.Options
-	routes []*Route
-	encoding string
-}
-
 // nats.Options wrapper.
 type Nats struct {
 	Opts *NatsOptions
 	EncCon *nats.EncodedConn
 }
 
-// Function for applying options to NatsOptions in NewNatsOptions
-// Using a function allows for a chain or heirarchy when applying them
-// eg func1 then func2 then func3
-// Internally allows for default options to be applied first.
-type OptionsFunc func(*NatsOptions) error
-
-// Holds route info including subscription
-type Route struct {
-	route      string
-	handler    nats.Handler
-	subsc      *nats.Subscription
-	queueGroup string
-}
-
-func (r *Route) GetRoute() string {
-	return r.route
-}
-
-func (r *Route) GetHandler() nats.Handler {
-	return r.handler
-}
-
-func (r *Route) GetSubscription() nats.Handler {
-	return r.subsc
-}
-
-func (r *Route) GetQueueGroup() string {
-	return r.queueGroup
-}
-
-func prepend(slice []OptionsFunc, item OptionsFunc) []OptionsFunc{
-	slice = append(slice, nil)
-	copy(slice[1:], slice)
-	slice[0] = item
-	return slice
-}
-
-// Initiating nats with default options and then applies each
-// option func in order on top of that.
-func NewNatsOptions(optionFuncs  ...OptionsFunc) (options *NatsOptions) {
-	options = &NatsOptions{Options: nats.DefaultOptions}
-	options.setOptions(prepend(optionFuncs, setDefaultOptions)...)
-	return
-}
-
-func (n *NatsOptions) SetEncoding(enc string){
-	n.encoding = enc
-}
-
-
-func (n *NatsOptions) setOptions(optionFuncs ...OptionsFunc) error {
-	for _, opt := range optionFuncs {
-		if err := opt(n); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func setDefaultOptions(options *NatsOptions) error {
-	options.encoding = nats.DEFAULT_ENCODER
-	options.MaxReconnect = 5
-	options.ReconnectWait = (2 * time.Second)
-	options.Timeout = (10 * time.Second)
-	options.NoRandomize = true
-	return nil
-}
 
 // Subscribe and record subscription to routes
 func (n *Nats) Subscribe(route string, handler nats.Handler) error{
@@ -106,36 +33,6 @@ func (n *Nats) QueueSubscribe(route string, group string, handler nats.Handler) 
 	return nil
 }
 
-// waits 1 second before trying again <attempts> number of times
-func (n *NatsOptions) ConnectOrRetry(attempts int) (natsObj *Nats,err error) {
-	natsObj,err = n.Connect()
-	if err != nil {
-		if attempts == 1 {
-			return
-		}
-		time.Sleep(1 * time.Second)
-		natsObj, err = n.ConnectOrRetry(attempts - 1)
-	}
-	return
-}
-
-// Start subscribing to subjects/routes. This is non blocking.
-func (natsOpts *NatsOptions) Connect() (natsObj *Nats, err error) {
-	con, err := natsOpts.Options.Connect()
-	if err != nil {
-		return
-	}
-
-	natsObj = &Nats{Opts : natsOpts}
-
-	natsObj.EncCon, err = nats.NewEncodedConn(con, natsOpts.encoding)
-	return
-}
-
-// Get slice of Routes
-func (n *NatsOptions) GetRoutes() []*Route{
-	return n.routes
-}
 
 // Unsubscribe all handlers
 func (n *Nats) UnsubscribeAll() {
@@ -143,6 +40,7 @@ func (n *Nats) UnsubscribeAll() {
 		route.subsc.Unsubscribe()
 	}
 }
+
 
 
 
