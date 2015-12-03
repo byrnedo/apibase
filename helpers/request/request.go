@@ -1,4 +1,4 @@
-package httphelp
+package request
 import (
 	"regexp"
 	"net/http"
@@ -11,13 +11,13 @@ var (
 )
 
 func AcceptsJson(r *http.Request) bool {
-	return acceptsJsonRegex.MatchString(r.Header("Accept"))
+	return acceptsJsonRegex.MatchString(r.Header.Get("Accept"))
 }
 
 func AcceptsHtml(r *http.Request) bool {
-	return acceptsHtmlRegex.MatchString(r.Header("Accept"))
+	return acceptsHtmlRegex.MatchString(r.Header.Get("Accept"))
 }
 
 func AcceptsXml(r *http.Request) bool {
-	return acceptsXmlRegex.MatchString(r.Header("Accept"))
+	return acceptsXmlRegex.MatchString(r.Header.Get("Accept"))
 }
