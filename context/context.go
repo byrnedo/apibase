@@ -13,4 +13,5 @@ type Context struct {
 	PutTime time.Time
 	PutType RequestType
 	Timeout time.Time
+	TraceID string
 }
