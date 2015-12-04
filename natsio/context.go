@@ -1,4 +1,4 @@
-package context
+package natsio
 import "time"
 
 type RequestType string
