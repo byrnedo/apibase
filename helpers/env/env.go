@@ -14,7 +14,7 @@ func GetOr(key string, fallback string) string {
 
 func GetOrInt(key string, fallback int) (int, error) {
 	if strVal, found := os.LookupEnv(key); found != false {
-		if val,err := strconv.Atoi(strVal); err != nil {
+		if val,err := strconv.Atoi(strVal); err == nil {
 			return val, nil
 		} else {
 			return 0, errors.New("Failed to make int from ENV " + key + ": " + err.Error())
