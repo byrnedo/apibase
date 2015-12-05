@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"strings"
 
-	. "github.com/byrnedo/apibase/logger"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -26,8 +25,6 @@ func Init(url string, debugLog *log.Logger) {
 		mgo.SetDebug(true)
 		mgo.SetLogger(debugLog)
 	}
-
-	Info.Println("Attempting to connect to [" + url + "]\n")
 
 	sess, err := mgo.Dial(url)
 	if err != nil {

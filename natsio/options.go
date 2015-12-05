@@ -8,6 +8,7 @@ type NatsOptions struct {
 	nats.Options
 	routes []*Route
 	encoding string
+	appName string
 }
 
 
@@ -48,6 +49,9 @@ func (n *NatsOptions) setOptions(optionFuncs ...OptionsFunc) error {
 
 // Start subscribing to subjects/routes. This is non blocking.
 func (natsOpts *NatsOptions) Connect() (natsObj *Nats, err error) {
+	if len(natsOpts.appName) < 1 {
+		panic("Must set appName in NatsOptions")
+	}
 	con, err := natsOpts.Options.Connect()
 	if err != nil {
 		return

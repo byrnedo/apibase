@@ -117,8 +117,9 @@ func TestNewNatsConnect(t *testing.T) {
 	var natsCon *Nats
 
 
+	time.Sleep(500 * time.Millisecond)
 
-	natsCon, err := natsOpts.ConnectOrRetry(3)
+	natsCon, err := natsOpts.Connect()
 	if err != nil {
 		t.Error("Failed to connect:" + err.Error())
 		return
@@ -158,9 +159,9 @@ func TestHandleFunc(t *testing.T) {
 
 	var natsCon *Nats
 
+	time.Sleep(500 * time.Millisecond)
 
-
-	natsCon, err := natsOpts.ConnectOrRetry(3)
+	natsCon, err := natsOpts.Connect()
 	if err != nil {
 		t.Error("Failed to connect:" + err.Error())
 		return
@@ -227,7 +228,9 @@ func setupConnection() *NatsOptions{
 
 	return NewNatsOptions(func(n *NatsOptions) error {
 		n.Url = "nats://localhost:" + NatsPort
+		n.appName = "it_test"
 		n.SetEncoding("gob")
+		n.Timeout = 10 * time.Second
 		return nil
 	})
 

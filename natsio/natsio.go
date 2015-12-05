@@ -3,6 +3,7 @@ package natsio
 import (
 	"errors"
 "github.com/apcera/nats"
+	"time"
 )
 
 // nats.Options wrapper.
@@ -31,6 +32,19 @@ func (n *Nats) QueueSubscribe(route string, group string, handler nats.Handler) 
 	n.Opts.routes = append(n.Opts.routes, &Route{route: route, handler: handler, subsc: subsc, queueGroup: group})
 	return nil
 }
+
+func (n *Nats) Publish(subject string, data interface{}) error {
+	return n.EncCon.Publish(subject, NewNatsDTO(n.Opts.appName, Publish, 0*time.Second, data))
+}
+
+func (n *Nats) PublishRequest(subject string, reply string, data interface{}) error {
+	return n.EncCon.PublishRequest(subject, reply, NewNatsDTO(n.Opts.appName, Publish, 0*time.Second, data))
+}
+
+func (n *Nats) Request(subject string, data interface{}, responsePtr interface{}, timeout time.Duration) error {
+	return n.EncCon.Request(subject,NewNatsDTO(n.Opts.appName, Request, timeout, data),responsePtr,timeout)
+}
+
 
 
 // Unsubscribe all handlers
