@@ -25,9 +25,13 @@ type TestPayload struct {
 }
 
 type TestRequest struct {
-	Context *NatsContext
+	NatsContext NatsContext
 	Error error
 	Data *TestPayload
+}
+
+func (t *TestRequest) Context() *NatsContext {
+	return &(t.NatsContext)
 }
 
 func startNatsContainer(dockCli *gDoc.Client) *gDoc.Container {
@@ -137,9 +141,7 @@ func TestNewNatsConnect(t *testing.T) {
 		//EncCon is nil at this point but that's ok
 		//since it wont get called until after connecting
 		//when it will then get a ping message.
-		testData.Context.AppendTrail("pong")
-		natsCon.EncCon.Publish(reply, &TestRequest{
-			Context: testData.Context,
+		natsCon.Publish(reply, &TestRequest{
 			Error: nil,
 			Data: &TestPayload{"Pong"},
 		})
@@ -148,11 +150,10 @@ func TestNewNatsConnect(t *testing.T) {
 	natsCon.Subscribe("test.a", handler)
 
 	response := TestRequest{}
-	request := TestRequest{
+	request := &TestRequest{
 		Data: &TestPayload{"Ping"},
-		Context: NewNatsContext("ping",Request,10*time.Second),
 	}
-	err = natsCon.EncCon.Request("test.a", request, &response, 2 * time.Second)
+	err = natsCon.Request("test.a", request, &response, 2 * time.Second)
 
 	if err != nil {
 		t.Error("Failed to get response:" + err.Error())
