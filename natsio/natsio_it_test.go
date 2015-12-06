@@ -9,10 +9,6 @@ import (
 	"reflect"
 )
 
-type TestData struct {
-	Message string
-}
-
 const (
 	NatsImage = "nats:latest"
 	NatsPort = "4223"
@@ -23,6 +19,17 @@ var (
 	dockCli *gDoc.Client
 	natsContainer *gDoc.Container
 )
+
+type TestPayload struct {
+	Data string
+}
+
+type TestRequest struct {
+	Context *NatsContext
+	Error error
+	Data *TestPayload
+}
+
 func startNatsContainer(dockCli *gDoc.Client) *gDoc.Container {
 
 	if err := dockCli.PullImage(gDoc.PullImageOptions{Repository: NatsImage, OutputStream: os.Stdout}, gDoc.AuthConfiguration{}); err != nil {
@@ -125,25 +132,35 @@ func TestNewNatsConnect(t *testing.T) {
 		return
 	}
 
-	var handler = func(subj string, reply string, testData *TestData) {
+	var handler = func(subj string, reply string, testData *TestRequest) {
 		t.Logf("Got message on nats: %+v", testData)
 		//EncCon is nil at this point but that's ok
 		//since it wont get called until after connecting
 		//when it will then get a ping message.
-		natsCon.EncCon.Publish(reply, &TestData{Message: "Pong"})
+		testData.Context.AppendTrail("pong")
+		natsCon.EncCon.Publish(reply, &TestRequest{
+			Context: testData.Context,
+			Error: nil,
+			Data: &TestPayload{"Pong"},
+		})
 	}
 
 	natsCon.Subscribe("test.a", handler)
 
-	response := TestData{}
-	err = natsCon.EncCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)
+	response := TestRequest{}
+	request := TestRequest{
+		Data: &TestPayload{"Ping"},
+		Context: NewNatsContext("ping",Request,10*time.Second),
+	}
+	err = natsCon.EncCon.Request("test.a", request, &response, 2 * time.Second)
+
 	if err != nil {
 		t.Error("Failed to get response:" + err.Error())
 		return
 	}
 
 	natsCon.UnsubscribeAll()
-	err = natsCon.EncCon.Request("test.a", TestData{"Ping"}, &response, 2 * time.Second)
+	err = natsCon.EncCon.Request("test.a", request, &response, 2 * time.Second)
 	if err == nil {
 		t.Error("Should have failed to get response")
 		return
@@ -228,8 +245,8 @@ func setupConnection() *NatsOptions{
 
 	return NewNatsOptions(func(n *NatsOptions) error {
 		n.Url = "nats://localhost:" + NatsPort
-		n.appName = "it_test"
-		n.SetEncoding("gob")
+		n.Name = "it_test"
+		n.SetEncoding(nats.JSON_ENCODER)
 		n.Timeout = 10 * time.Second
 		return nil
 	})
