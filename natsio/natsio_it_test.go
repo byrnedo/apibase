@@ -77,6 +77,7 @@ func TestNewNatsConnect(t *testing.T) {
 		//when it will then get a ping message.
 		natsCon.Publish(reply, &TestRequest{
 			NatsDTO: NatsDTO{
+				NatsCtx: testData.NatsCtx,
 				Error: nil,
 			},
 			Data: TestPayload{"Pong"},
@@ -92,9 +93,20 @@ func TestNewNatsConnect(t *testing.T) {
 	}
 	err = natsCon.Request("test.a", request, &response, 2 * time.Second)
 
+	t.Logf("Got response on nats: %+v", response)
+
 	if err != nil {
 		t.Error("Failed to get response:" + err.Error())
 		return
+	}
+
+	if len(response.NatsCtx.AppTrail) != 2 {
+		t.Errorf("App trail len is %d, expected 2\n", len(response.NatsCtx.AppTrail))
+		return
+	}
+
+	if response.NatsCtx.TraceID != request.NatsCtx.TraceID {
+		t.Errorf("Request and response trace id differs\nExpected %s\nReceived %s\n", request.NatsCtx.TraceID, response.NatsCtx.TraceID)
 	}
 
 	natsCon.UnsubscribeAll()
