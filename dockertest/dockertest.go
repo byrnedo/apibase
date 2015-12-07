@@ -26,7 +26,6 @@ func Start(image string, portB map[gDoc.Port][]gDoc.PortBinding) (string, error)
 
 	con, err := dockCli.CreateContainer(gDoc.CreateContainerOptions{
 		Config: &gDoc.Config{
-			Cmd : []string{"--debug", "--logtime"},
 			Labels: map[string]string{
 				"ApiBaseTestFlag" : image,
 			},

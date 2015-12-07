@@ -42,13 +42,10 @@ func TestDefaultConfig(t *testing.T) {
 
 func TestConnectAndQuery(t *testing.T) {
 	var err error
-	dckrCli, err = gDoc.NewClientFromEnv()
-	if err != nil {
-		panic("Failed to connect to docker:" + err.Error())
-	}
 
-	setupContainer()
-	t.Log("Container set up.")
+	fmt.Println("Setting up container")
+	setupContainer(t)
+	fmt.Println("Container set up.")
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -57,7 +54,7 @@ func TestConnectAndQuery(t *testing.T) {
 
 	}()
 	Init(func(c *Config) {
-		c.ConnectString = fmt.Sprintf("dbname=postgres user=postgres password=%s host=localhost port=%d sslmode=disable connect_timeout=5", PostgresPassword, PostgresPort)
+		c.ConnectString = fmt.Sprintf("dbname=postgres user=postgres host=127.0.0.1 port=%s sslmode=disable connect_timeout=5", PostgresPort)
 	})
 
 	if DB == nil {
@@ -72,9 +69,10 @@ func TestConnectAndQuery(t *testing.T) {
 
 }
 
-func setupContainer() {
+func setupContainer(t *testing.T) {
 
 	if id, err := dockertest.Running(PostgresImage); err != nil || len(id) < 1 {
+		t.Log("Starting container")
 		if _, err := dockertest.Start(PostgresImage, map[gDoc.Port][]gDoc.PortBinding{
 			"5432/tcp" : []gDoc.PortBinding{gDoc.PortBinding{
 				HostIP: "127.0.0.1",
