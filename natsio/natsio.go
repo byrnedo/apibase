@@ -39,6 +39,9 @@ type PayloadWithContext interface {
 	NewContext(*NatsContext)
 }
 
+// Adds a context if it doesn't exist. Otherwise appends which app and time
+// that this message is being sent at.
+// Adds a traceID if not already there
 func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
 	if data.Context() == nil {
 		data.NewContext(&NatsContext{})
