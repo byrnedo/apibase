@@ -36,9 +36,13 @@ func (n *Nats) QueueSubscribe(route string, group string, handler nats.Handler) 
 
 type PayloadWithContext interface {
 	Context() *NatsContext
+	NewContext(*NatsContext)
 }
 
 func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
+	if data.Context() == nil {
+		data.NewContext(&NatsContext{})
+	}
 	if len(data.Context().TraceID) == 0 {
 		data.Context().TraceID = uuid.NewUUID().String()
 	}

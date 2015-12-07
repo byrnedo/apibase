@@ -25,13 +25,17 @@ type TestPayload struct {
 }
 
 type TestRequest struct {
-	NatsContext NatsContext
+	NatsContext *NatsContext
 	Error error
 	Data *TestPayload
 }
 
 func (t *TestRequest) Context() *NatsContext {
-	return &(t.NatsContext)
+	return t.NatsContext
+}
+
+func (t *TestRequest) NewContext(ctx *NatsContext) {
+	t.NatsContext = ctx
 }
 
 func startNatsContainer(dockCli *gDoc.Client) *gDoc.Container {

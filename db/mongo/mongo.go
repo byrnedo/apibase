@@ -62,27 +62,3 @@ func ConvertObjectIds(query map[string]interface{}) {
 	}
 }
 
-// GetAll retrieves all records matches certain condition. Returns empty list if
-// no records exist
-func GetAll(c *mgo.Collection,
-query map[string]interface{}, // TODO
-fields []string,
-sortBy []string,
-offset int,
-limit int,
-result interface{}) (err error) {
-
-	resultv := reflect.ValueOf(result)
-	if resultv.Kind() != reflect.Ptr || resultv.Elem().Kind() != reflect.Slice {
-		panic("result argument must be a slice address")
-	}
-
-	// change the ids to be object ids before we go
-	if len(query) != 0 {
-		ConvertObjectIds(query)
-	}
-
-	err = c.Find(query).Select(ToBsonMap(fields...)).Skip(offset).Limit(limit).Sort(sortBy...).All(result)
-
-	return
-}
