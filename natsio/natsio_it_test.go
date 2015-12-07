@@ -25,18 +25,10 @@ type TestPayload struct {
 }
 
 type TestRequest struct {
-	NatsContext *NatsContext
-	Error error
-	Data *TestPayload
+	NatsDTO
+	Data TestPayload
 }
 
-func (t *TestRequest) Context() *NatsContext {
-	return t.NatsContext
-}
-
-func (t *TestRequest) NewContext(ctx *NatsContext) {
-	t.NatsContext = ctx
-}
 
 func startNatsContainer(dockCli *gDoc.Client) *gDoc.Container {
 
@@ -146,8 +138,10 @@ func TestNewNatsConnect(t *testing.T) {
 		//since it wont get called until after connecting
 		//when it will then get a ping message.
 		natsCon.Publish(reply, &TestRequest{
-			Error: nil,
-			Data: &TestPayload{"Pong"},
+			NatsDTO: NatsDTO{
+				Error: nil,
+			},
+			Data: TestPayload{"Pong"},
 		})
 	}
 
@@ -155,7 +149,8 @@ func TestNewNatsConnect(t *testing.T) {
 
 	response := TestRequest{}
 	request := &TestRequest{
-		Data: &TestPayload{"Ping"},
+		NatsDTO: NatsDTO{},
+		Data: TestPayload{"Ping"},
 	}
 	err = natsCon.Request("test.a", request, &response, 2 * time.Second)
 

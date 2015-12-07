@@ -26,3 +26,15 @@ func (n *NatsContext) appendTrail(appName string, requestType RequestType){
 	n.AppTrail = append(n.AppTrail, Trail{appName, requestType, time.Now()})
 }
 
+type NatsDTO struct {
+	NatsCtx NatsContext
+	Error error
+}
+
+func (n *NatsDTO) Context() *NatsContext {
+	return &n.NatsCtx
+}
+
+func (n *NatsDTO) NewContext(nC *NatsContext) {
+	n.NatsCtx = *nC
+}

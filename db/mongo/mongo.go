@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"log"
-	"reflect"
 	"strings"
 
 	"gopkg.in/mgo.v2"
