@@ -53,7 +53,7 @@ func (jC *JsonController) ServeJsonStatus(w http.ResponseWriter, data interface{
 	dataBytes, err := json.Marshal(data)
 	if err != nil {
 		Error.Println("Failed to marshal payload:" + err.Error())
-		jC.JsonError(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		jC.ServeError(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -62,7 +62,7 @@ func (jC *JsonController) ServeJsonStatus(w http.ResponseWriter, data interface{
 }
 
 // Serve error
-func (jC *JsonController) JsonError(w http.ResponseWriter, message string, status int) {
+func (jC *JsonController) ServeError(w http.ResponseWriter, message string, status int) {
 	jsonErr := jC.errorHandler.ToJson(message, status)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
