@@ -6,6 +6,7 @@ import (
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 // Mongo session holder
@@ -25,7 +26,7 @@ func Init(url string, debugLog *log.Logger) {
 		mgo.SetLogger(debugLog)
 	}
 
-	sess, err := mgo.Dial(url)
+	sess, err := mgo.DialWithTimeout(url, 15*time.Second)
 	if err != nil {
 		panic(err)
 	}
