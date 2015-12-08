@@ -34,6 +34,7 @@ func (n *Nats) QueueSubscribe(route string, group string, handler nats.Handler) 
 	return nil
 }
 
+// For use when using nats request/publish/publishrequest wrapper functions
 type PayloadWithContext interface {
 	Context() *NatsContext
 	NewContext(*NatsContext)
@@ -52,16 +53,29 @@ func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
 	data.Context().appendTrail(n.Opts.Name, requestType)
 }
 
+// Wrapper for nats Publish function. Needs a payload which has
+// a context object (see PayloadWithContext type)
+// Adds a context if it doesn't exist. Otherwise appends which app and time
+// that this message is being sent at.
+// Adds a traceID if not already there
 func (n *Nats) Publish(subject string, data PayloadWithContext) error {
 	n.updateContext(data, Publish)
 	return n.EncCon.Publish(subject, data)
 }
 
+// Wrapper for nats PublishRequest function with context.
+// Adds a context if it doesn't exist. Otherwise appends which app and time
+// that this message is being sent at.
+// Adds a traceID if not already there
 func (n *Nats) PublishRequest(subject string, reply string, data PayloadWithContext) error {
 	n.updateContext(data, PublishRequest)
 	return n.EncCon.PublishRequest(subject, reply, data)
 }
 
+// Wrapper for nats Request function with context.
+// Adds a context if it doesn't exist. Otherwise appends which app and time
+// that this message is being sent at.
+// Adds a traceID if not already there
 func (n *Nats) Request(subject string, data PayloadWithContext, responsePtr interface{}, timeout time.Duration) error {
 	n.updateContext(data, Request)
 	return n.EncCon.Request(subject, data, responsePtr, timeout)

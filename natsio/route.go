@@ -2,6 +2,7 @@ package natsio
 import "github.com/apcera/nats"
 
 // Holds route info including subscription
+// holds route,handler,nats subscripiton and queue group.
 type Route struct {
 	route      string
 	handler    nats.Handler

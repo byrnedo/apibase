@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+// Used to create a nats connection.
+// To be used in conjunction with a Nats controller to subscribe routes.
 type NatsOptions struct {
 	nats.Options
 	routes []*Route
@@ -32,6 +34,7 @@ func NewNatsOptions(optionFuncs  ...OptionsFunc) (options *NatsOptions) {
 	return
 }
 
+// Set the encoding (json/gob)
 func (n *NatsOptions) SetEncoding(enc string){
 	n.encoding = enc
 }
