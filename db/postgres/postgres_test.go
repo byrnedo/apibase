@@ -1,25 +1,24 @@
 package postgres
+
 import (
-	"testing"
-	"reflect"
-	"time"
-	gDoc "github.com/fsouza/go-dockerclient"
-	"github.com/byrnedo/apibase/dockertest"
 	"fmt"
+	"github.com/byrnedo/apibase/dockertest"
+	gDoc "github.com/fsouza/go-dockerclient"
+	"reflect"
+	"testing"
+	"time"
 )
 
 const (
-	PostgresImage = "postgres:9.4"
-	PostgresPort = "5532"
+	PostgresImage    = "postgres:9.4"
+	PostgresPort     = "5532"
 	PostgresPassword = "mysecretpassword"
-
 )
 
 var (
-	dckrCli *gDoc.Client
+	dckrCli  *gDoc.Client
 	psqlCntr *gDoc.Container
 )
-
 
 func TestDefaultConfig(t *testing.T) {
 	conf := newDefaultConfig(func(c *Config) {
@@ -27,15 +26,15 @@ func TestDefaultConfig(t *testing.T) {
 	})
 
 	expectedConf := Config{
-		ConnectString: "",
-		MaxIdleCons: 4,
-		MaxOpenCons: 16,
-		EnableQueryInterp: true,
-		LogQueriesThreshold:2 * time.Second,
-		ProdMode: true,
+		ConnectString:       "",
+		MaxIdleCons:         4,
+		MaxOpenCons:         16,
+		EnableQueryInterp:   true,
+		LogQueriesThreshold: 2 * time.Second,
+		ProdMode:            true,
 	}
 
-	if ! reflect.DeepEqual(conf, &expectedConf) {
+	if !reflect.DeepEqual(conf, &expectedConf) {
 		t.Errorf("Default conf not as expected\nexpected %+v\n     got %+v\n", &expectedConf, conf)
 	}
 }
@@ -66,7 +65,6 @@ func TestConnectAndQuery(t *testing.T) {
 		t.Error("Failed to do select: ", err.Error())
 	}
 
-
 }
 
 func setupContainer(t *testing.T) {
@@ -74,8 +72,8 @@ func setupContainer(t *testing.T) {
 	if id, err := dockertest.Running(PostgresImage); err != nil || len(id) < 1 {
 		t.Log("Starting container")
 		if _, err := dockertest.Start(PostgresImage, map[gDoc.Port][]gDoc.PortBinding{
-			"5432/tcp" : []gDoc.PortBinding{gDoc.PortBinding{
-				HostIP: "127.0.0.1",
+			"5432/tcp": []gDoc.PortBinding{gDoc.PortBinding{
+				HostIP:   "127.0.0.1",
 				HostPort: PostgresPort,
 			}},
 		}); err != nil {
@@ -84,5 +82,3 @@ func setupContainer(t *testing.T) {
 
 	}
 }
-
-

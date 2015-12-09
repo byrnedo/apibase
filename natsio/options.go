@@ -1,4 +1,5 @@
 package natsio
+
 import (
 	"github.com/apcera/nats"
 	"time"
@@ -8,10 +9,9 @@ import (
 // To be used in conjunction with a Nats controller to subscribe routes.
 type NatsOptions struct {
 	nats.Options
-	routes []*Route
+	routes   []*Route
 	encoding string
 }
-
 
 // Function for applying options to NatsOptions in NewNatsOptions
 // Using a function allows for a chain or heirarchy when applying them
@@ -19,7 +19,7 @@ type NatsOptions struct {
 // Internally allows for default options to be applied first.
 type OptionsFunc func(*NatsOptions) error
 
-func prepend(slice []OptionsFunc, item OptionsFunc) []OptionsFunc{
+func prepend(slice []OptionsFunc, item OptionsFunc) []OptionsFunc {
 	slice = append(slice, nil)
 	copy(slice[1:], slice)
 	slice[0] = item
@@ -28,17 +28,16 @@ func prepend(slice []OptionsFunc, item OptionsFunc) []OptionsFunc{
 
 // Initiating nats with default options and then applies each
 // option func in order on top of that.
-func NewNatsOptions(optionFuncs  ...OptionsFunc) (options *NatsOptions) {
+func NewNatsOptions(optionFuncs ...OptionsFunc) (options *NatsOptions) {
 	options = &NatsOptions{Options: nats.DefaultOptions}
 	options.setOptions(prepend(optionFuncs, setDefaultOptions)...)
 	return
 }
 
 // Set the encoding (json/gob)
-func (n *NatsOptions) SetEncoding(enc string){
+func (n *NatsOptions) SetEncoding(enc string) {
 	n.encoding = enc
 }
-
 
 func (n *NatsOptions) setOptions(optionFuncs ...OptionsFunc) error {
 	for _, opt := range optionFuncs {
@@ -59,14 +58,14 @@ func (natsOpts *NatsOptions) Connect() (natsObj *Nats, err error) {
 		return
 	}
 
-	natsObj = &Nats{Opts : natsOpts}
+	natsObj = &Nats{Opts: natsOpts}
 
 	natsObj.EncCon, err = nats.NewEncodedConn(con, natsOpts.encoding)
 	return
 }
 
 // Get slice of Routes
-func (n *NatsOptions) GetRoutes() []*Route{
+func (n *NatsOptions) GetRoutes() []*Route {
 	return n.routes
 }
 

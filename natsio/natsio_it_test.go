@@ -1,17 +1,18 @@
 package natsio
+
 import (
-	"os"
-	"testing"
-	"time"
 	"github.com/apcera/nats"
-	"reflect"
 	"github.com/byrnedo/apibase/dockertest"
 	gDoc "github.com/fsouza/go-dockerclient"
+	"os"
+	"reflect"
+	"testing"
+	"time"
 )
 
 const (
 	NatsImage = "nats:latest"
-	NatsPort = "5222"
+	NatsPort  = "5222"
 )
 
 var (
@@ -27,7 +28,6 @@ type TestRequest struct {
 	Data TestPayload
 }
 
-
 func setup() {
 	var (
 		err error
@@ -35,8 +35,8 @@ func setup() {
 
 	if natsContainer, err = dockertest.Running(NatsImage); err != nil || len(natsContainer) == 0 {
 		if natsContainer, err = dockertest.Start(NatsImage, map[gDoc.Port][]gDoc.PortBinding{
-			"4222/tcp" : []gDoc.PortBinding{gDoc.PortBinding{
-				HostIP: "127.0.0.1",
+			"4222/tcp": []gDoc.PortBinding{gDoc.PortBinding{
+				HostIP:   "127.0.0.1",
 				HostPort: NatsPort,
 			}},
 		}); err != nil {
@@ -61,7 +61,6 @@ func TestNewNatsConnect(t *testing.T) {
 
 	var natsCon *Nats
 
-
 	time.Sleep(500 * time.Millisecond)
 
 	natsCon, err := natsOpts.Connect()
@@ -78,7 +77,7 @@ func TestNewNatsConnect(t *testing.T) {
 		natsCon.Publish(reply, &TestRequest{
 			NatsDTO: NatsDTO{
 				NatsCtx: testData.NatsCtx,
-				Error: nil,
+				Error:   nil,
 			},
 			Data: TestPayload{"Pong"},
 		})
@@ -89,9 +88,9 @@ func TestNewNatsConnect(t *testing.T) {
 	response := TestRequest{}
 	request := &TestRequest{
 		NatsDTO: NatsDTO{},
-		Data: TestPayload{"Ping"},
+		Data:    TestPayload{"Ping"},
 	}
-	err = natsCon.Request("test.a", request, &response, 2 * time.Second)
+	err = natsCon.Request("test.a", request, &response, 2*time.Second)
 
 	t.Logf("Got response on nats: %+v", response)
 
@@ -110,7 +109,7 @@ func TestNewNatsConnect(t *testing.T) {
 	}
 
 	natsCon.UnsubscribeAll()
-	err = natsCon.EncCon.Request("test.a", request, &response, 2 * time.Second)
+	err = natsCon.EncCon.Request("test.a", request, &response, 2*time.Second)
 	if err == nil {
 		t.Error("Should have failed to get response")
 		return
@@ -189,7 +188,6 @@ func TestHandleFunc(t *testing.T) {
 	}
 
 }
-
 
 func setupConnection() *NatsOptions {
 

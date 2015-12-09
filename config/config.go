@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 )
 
-func ParseFile(path string) (*parse.Tree,error) {
+func ParseFile(path string) (*parse.Tree, error) {
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, errors.New("Failed to read config file")

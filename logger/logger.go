@@ -2,8 +2,8 @@ package logger
 
 import (
 	"io"
-	"log"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -22,8 +22,8 @@ type LogLevel int
 
 const (
 	TraceLevel LogLevel = 0
-	InfoLevel LogLevel = 1
-	WarnLevel LogLevel = 2
+	InfoLevel  LogLevel = 1
+	WarnLevel  LogLevel = 2
 	ErrorLevel LogLevel = 3
 )
 

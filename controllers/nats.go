@@ -1,7 +1,8 @@
 package controllers
+
 import (
-	"github.com/byrnedo/apibase/routes"
 	"github.com/byrnedo/apibase/natsio"
+	"github.com/byrnedo/apibase/routes"
 )
 
 type NatsController interface {
@@ -13,4 +14,3 @@ func SubscribeNatsRoutes(natsCon *natsio.Nats, queueName string, controllers Nat
 		natsCon.QueueSubscribe(route.GetPath(), queueName, route.GetHandler())
 	}
 }
-

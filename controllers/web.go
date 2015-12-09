@@ -1,16 +1,16 @@
 package controllers
-import (
-	"github.com/byrnedo/apibase/routes"
-	"github.com/julienschmidt/httprouter"
-	"encoding/json"
-	. "github.com/byrnedo/apibase/logger"
-	"net/http"
-	"strings"
-	"strconv"
-	"errors"
-	"github.com/byrnedo/mapcast"
-)
 
+import (
+	"encoding/json"
+	"errors"
+	. "github.com/byrnedo/apibase/logger"
+	"github.com/byrnedo/apibase/routes"
+	"github.com/byrnedo/mapcast"
+	"github.com/julienschmidt/httprouter"
+	"net/http"
+	"strconv"
+	"strings"
+)
 
 type WebController interface {
 	GetRoutes() []*routes.WebRoute
@@ -22,7 +22,6 @@ func RegisterRoutes(rtr *httprouter.Router, controller WebController) {
 		rtr.Handle(route.GetMethod(), route.GetPath(), route.GetHandler())
 	}
 }
-
 
 // Controller with json helpers
 type JsonController struct {
@@ -63,7 +62,7 @@ func (bC *BaseController) QueryInt(r *http.Request, param string) (int, error) {
 // 		"val",
 //		"val2",
 // }
-func (bC *BaseController) QueryMap(r *http.Request, param string) (map[string]string) {
+func (bC *BaseController) QueryMap(r *http.Request, param string) map[string]string {
 	mapData := make(map[string]string, 0)
 	if vals := r.URL.Query()[param]; len(vals) > 0 {
 		for _, unsplitKeyVal := range vals {
@@ -83,4 +82,3 @@ func (bC *BaseController) QueryInterfaceMap(r *http.Request, param string, targe
 	stringMap := bC.QueryMap(r, param)
 	return mapcast.CastViaJsonToBson(stringMap, target)
 }
-

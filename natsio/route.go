@@ -1,4 +1,5 @@
 package natsio
+
 import "github.com/apcera/nats"
 
 // Holds route info including subscription
@@ -25,4 +26,3 @@ func (r *Route) GetSubscription() nats.Handler {
 func (r *Route) GetQueueGroup() string {
 	return r.queueGroup
 }
-

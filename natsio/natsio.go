@@ -3,8 +3,8 @@ package natsio
 import (
 	"errors"
 	"github.com/apcera/nats"
-	"time"
 	"github.com/pborman/uuid"
+	"time"
 )
 
 // nats.Options wrapper.
@@ -12,7 +12,6 @@ type Nats struct {
 	Opts   *NatsOptions
 	EncCon *nats.EncodedConn
 }
-
 
 // Subscribe and record subscription to routes
 func (n *Nats) Subscribe(route string, handler nats.Handler) error {
@@ -87,8 +86,3 @@ func (n *Nats) UnsubscribeAll() {
 		route.subsc.Unsubscribe()
 	}
 }
-
-
-
-
-

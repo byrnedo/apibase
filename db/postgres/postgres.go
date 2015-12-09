@@ -2,12 +2,12 @@ package postgres
 
 import (
 	"database/sql"
+	"github.com/DavidHuie/gomigrate"
 	_ "github.com/lib/pq"
 	"gopkg.in/mgutz/dat.v1"
+	"gopkg.in/mgutz/dat.v1/kvs"
 	"gopkg.in/mgutz/dat.v1/sqlx-runner"
 	"time"
-	"github.com/DavidHuie/gomigrate"
-	"gopkg.in/mgutz/dat.v1/kvs"
 )
 
 // global database (pooling provided by SQL driver)
@@ -29,14 +29,13 @@ type Config struct {
 	LogQueriesThreshold time.Duration
 }
 
-
 func newDefaultConfig(confFuncs ...func(*Config)) *Config {
 	config := Config{
-		MaxIdleCons: 4,
-		MaxOpenCons: 16,
-		EnableQueryInterp: true,
+		MaxIdleCons:         4,
+		MaxOpenCons:         16,
+		EnableQueryInterp:   true,
 		LogQueriesThreshold: 2 * time.Second,
-		ProdMode: true,
+		ProdMode:            true,
 	}
 	for _, f := range confFuncs {
 		f(&config)
@@ -47,7 +46,6 @@ func newDefaultConfig(confFuncs ...func(*Config)) *Config {
 func Init(confFunc func(conf *Config)) {
 
 	conf := newDefaultConfig(confFunc)
-
 
 	// create a normal database connection through database/sql
 	db, err := sql.Open("postgres", conf.ConnectString)

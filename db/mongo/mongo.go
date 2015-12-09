@@ -51,7 +51,7 @@ func ConvertObjectIds(query map[string]interface{}) {
 			index = "_id"
 		}
 		if strings.HasSuffix(index, "_id") {
-			switch query[index].(type){
+			switch query[index].(type) {
 			case string:
 				var strVal = qVal.(string)
 				if bson.IsObjectIdHex(strVal) {
@@ -61,4 +61,3 @@ func ConvertObjectIds(query map[string]interface{}) {
 		}
 	}
 }
-

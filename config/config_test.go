@@ -1,14 +1,14 @@
 package config
 
 import (
+	"github.com/byrnedo/typesafe-config/parse"
 	"testing"
-"github.com/byrnedo/typesafe-config/parse"
 )
 
 func TestParse(t *testing.T) {
 	var (
 		tree *parse.Tree
-		err error
+		err  error
 	)
 
 	if tree, err = ParseFile("./test.conf"); err != nil {

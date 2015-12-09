@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/byrnedo/apibase/config"
 	. "github.com/byrnedo/apibase/logger"
-	"os"
-	"io"
 	"github.com/byrnedo/typesafe-config/parse"
+	"io"
+	"os"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 
 func createLogger(logFilePath string, logLevel LogLevel) {
 	var (
-		logWriter io.Writer
+		logWriter    io.Writer
 		errLogWriter io.Writer
 	)
 
@@ -24,7 +24,7 @@ func createLogger(logFilePath string, logLevel LogLevel) {
 
 		logOpts.Level = logLevel
 		if len(logFilePath) > 0 {
-			file, err := os.OpenFile(logFilePath, os.O_CREATE | os.O_WRONLY | os.O_APPEND, 0666)
+			file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 			if err != nil {
 				panic("Failed to open log file " + logFilePath + ":" + err.Error())
 			}
@@ -35,7 +35,6 @@ func createLogger(logFilePath string, logLevel LogLevel) {
 			logWriter = os.Stdout
 			errLogWriter = os.Stderr
 		}
-
 
 		logOpts.TraceHandle = logWriter
 		logOpts.InfoHandle = logWriter
@@ -48,10 +47,10 @@ func createLogger(logFilePath string, logLevel LogLevel) {
 func Init() {
 
 	var (
-		configFile string
+		configFile  string
 		logFilePath string
-		logLevel LogLevel
-		showUsage bool
+		logLevel    LogLevel
+		showUsage   bool
 	)
 
 	flag.StringVar(&configFile, "conf", "", "Configuration file path")
@@ -69,7 +68,7 @@ func Init() {
 
 	tree, err := config.ParseFile(configFile)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error parsing config file:" + err.Error())
+		fmt.Fprintln(os.Stderr, "Error parsing config file:"+err.Error())
 		os.Exit(1)
 	}
 	Conf = tree.GetConfig()

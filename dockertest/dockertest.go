@@ -1,12 +1,13 @@
 package dockertest
+
 import (
-	"os"
 	gDoc "github.com/fsouza/go-dockerclient"
+	"os"
 )
+
 var (
 	dockCli *gDoc.Client
 )
-
 
 func init() {
 	var err error
@@ -15,7 +16,6 @@ func init() {
 		panic("Failed to connect to docker:" + err.Error())
 	}
 }
-
 
 func Start(image string, portB map[gDoc.Port][]gDoc.PortBinding) (string, error) {
 
@@ -27,7 +27,7 @@ func Start(image string, portB map[gDoc.Port][]gDoc.PortBinding) (string, error)
 	con, err := dockCli.CreateContainer(gDoc.CreateContainerOptions{
 		Config: &gDoc.Config{
 			Labels: map[string]string{
-				"ApiBaseTestFlag" : image,
+				"ApiBaseTestFlag": image,
 			},
 			Image: image,
 		},
@@ -46,9 +46,9 @@ func Start(image string, portB map[gDoc.Port][]gDoc.PortBinding) (string, error)
 }
 
 func Running(image string) (string, error) {
-	cons, err :=dockCli.ListContainers(gDoc.ListContainersOptions{
+	cons, err := dockCli.ListContainers(gDoc.ListContainersOptions{
 		Filters: map[string][]string{
-			"label":[]string{"ApiBaseTestFlag=" + image},
+			"label": []string{"ApiBaseTestFlag=" + image},
 		},
 	})
 	if err != nil {
@@ -63,7 +63,7 @@ func Running(image string) (string, error) {
 
 func Stop(image string) (bool, error) {
 	var (
-		id string
+		id  string
 		err error
 	)
 	if id, err = Running(image); err != nil && len(id) > 0 {
@@ -71,9 +71,9 @@ func Stop(image string) (bool, error) {
 	}
 	if err = dockCli.RemoveContainer(gDoc.RemoveContainerOptions{
 		Force: true,
-		ID: id,
+		ID:    id,
 	}); err != nil {
-		return false,err
+		return false, err
 	}
 	return true, nil
 

@@ -1,4 +1,5 @@
 package natsio
+
 import (
 	"testing"
 )
@@ -25,4 +26,3 @@ func Test_NewNatsDefaultOptionsApplied(t *testing.T) {
 		t.Error("Default options were not applied")
 	}
 }
-

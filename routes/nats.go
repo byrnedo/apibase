@@ -1,16 +1,17 @@
 package routes
+
 import "github.com/apcera/nats"
 
 // Holder for a nats route's info.
 type NatsRoute struct {
-	path  string
+	path    string
 	handler nats.Handler
 }
 
 // Create a new route with it's subscription path and corresponding handler.
 func NewNatsRoute(pathStr string, handlerFun nats.Handler) *NatsRoute {
 	return &NatsRoute{
-		path: pathStr,
+		path:    pathStr,
 		handler: handlerFun,
 	}
 }
@@ -24,4 +25,3 @@ func (n *NatsRoute) GetPath() string {
 func (n *NatsRoute) GetHandler() nats.Handler {
 	return n.handler
 }
-

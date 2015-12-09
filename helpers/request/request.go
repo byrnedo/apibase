@@ -1,7 +1,8 @@
 package request
+
 import (
-	"regexp"
 	"net/http"
+	"regexp"
 )
 
 var (

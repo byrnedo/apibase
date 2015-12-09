@@ -1,11 +1,12 @@
 package middleware
+
 import (
-	"time"
-	"net/http"
-	. "github.com/byrnedo/apibase/logger"
 	"encoding/json"
+	. "github.com/byrnedo/apibase/logger"
 	"github.com/byrnedo/svccommon/msgspec/web"
+	"net/http"
 	"runtime/debug"
+	"time"
 )
 
 func LogTime(next http.Handler) http.Handler {
@@ -16,7 +17,13 @@ func LogTime(next http.Handler) http.Handler {
 
 		duration := time.Since(startTime)
 
-		Info.Printf("[%s] %q %v \n", r.Method, r.URL.Path, duration)
+		var ips string
+		if forIps := r.Header.Get("x-forwarded-for"); len(forIps) > 0 {
+			ips = forIps
+		} else {
+			ips= r.RemoteAddr
+		}
+		Info.Printf("%s -> [%s] %q %v \n", ips, r.Method, r.URL.Path, duration)
 	})
 }
 
@@ -24,7 +31,7 @@ func RecoverHandler(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
-				Error.Println("panic:",err, "\n\n", string(debug.Stack()))
+				Error.Println("panic:", err, "\n\n", string(debug.Stack()))
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			}
 		}()

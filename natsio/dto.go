@@ -1,4 +1,5 @@
 package natsio
+
 import (
 	"time"
 )
@@ -6,25 +7,26 @@ import (
 type RequestType string
 
 const (
-	Publish RequestType = "PUB"
+	Publish        RequestType = "PUB"
 	PublishRequest RequestType = "PUBREQ"
-	Request RequestType = "REQ"
+	Request        RequestType = "REQ"
 )
+
 // Holder for trail of requests between services
 type Trail struct {
 	AppName string
 	PutType RequestType
-	Time time.Time
+	Time    time.Time
 }
 
 // Holds info about a chain of nats requests.
 type NatsContext struct {
 	AppTrail []Trail
-	TraceID string
+	TraceID  string
 }
 
 // Adds another link in the trail.
-func (n *NatsContext) appendTrail(appName string, requestType RequestType){
+func (n *NatsContext) appendTrail(appName string, requestType RequestType) {
 	n.AppTrail = append(n.AppTrail, Trail{appName, requestType, time.Now()})
 }
 
@@ -32,7 +34,7 @@ func (n *NatsContext) appendTrail(appName string, requestType RequestType){
 // and an error field
 type NatsDTO struct {
 	NatsCtx NatsContext
-	Error error
+	Error   error
 }
 
 // Retrieve a pointer to the context object
