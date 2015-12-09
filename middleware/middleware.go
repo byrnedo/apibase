@@ -44,9 +44,7 @@ func AcceptJsonHandler(next http.Handler) http.Handler {
 			json.NewEncoder(w).Encode(web.NewErrorResponse().AddError(406, nil, "", "Accept header must be set to 'application/vnd.api+json'."))
 			return
 		}
-
 		next.ServeHTTP(w, r)
 	}
-
 	return http.HandlerFunc(fn)
 }

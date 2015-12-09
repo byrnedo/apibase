@@ -8,6 +8,7 @@ import (
 	"strings"
 	"strconv"
 	"errors"
+	"github.com/byrnedo/mapcast"
 )
 
 
@@ -46,7 +47,7 @@ func (jC *JsonController) ServeWithStatus(w http.ResponseWriter, data interface{
 	w.Write(bytes)
 }
 
-type BaseController struct {}
+type BaseController struct{}
 
 // Gets first query string value as int
 func (bC *BaseController) QueryInt(r *http.Request, param string) (int, error) {
@@ -63,11 +64,11 @@ func (bC *BaseController) QueryInt(r *http.Request, param string) (int, error) {
 //		"val2",
 // }
 func (bC *BaseController) QueryMap(r *http.Request, param string) (map[string]string) {
-	mapData := make(map[string]string,0)
+	mapData := make(map[string]string, 0)
 	if vals := r.URL.Query()[param]; len(vals) > 0 {
 		for _, unsplitKeyVal := range vals {
-			keyVal := strings.SplitN(unsplitKeyVal, ":", 1)
-			if len(keyVal) > 1 {
+			keyVal := strings.SplitN(unsplitKeyVal, ":", 2)
+			if len(keyVal) == 2 {
 				mapData[keyVal[0]] = keyVal[1]
 			} else {
 				mapData[keyVal[0]] = ""
@@ -76,3 +77,10 @@ func (bC *BaseController) QueryMap(r *http.Request, param string) (map[string]st
 	}
 	return mapData
 }
+
+// Uses byrnedo/mapcast to turn query string map into a typed map.
+func (bC *BaseController) QueryInterfaceMap(r *http.Request, param string, target interface{}) (ifMap map[string]interface{}) {
+	stringMap := bC.QueryMap(r, param)
+	return mapcast.CastViaJsonToBson(stringMap, target)
+}
+
