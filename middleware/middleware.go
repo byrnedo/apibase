@@ -16,7 +16,7 @@ func LogTime(next http.Handler) http.Handler {
 
 		duration := time.Since(startTime)
 
-		Info.Printf("[%s] %q %v\n", r.Method, r.URL.Path, duration)
+		Info.Printf("[%s] %q %v \n", r.Method, r.URL.Path, duration)
 	})
 }
 
@@ -24,7 +24,7 @@ func RecoverHandler(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
-				Error.Println("panic:",err, "\n", string(debug.Stack()))
+				Error.Println("panic:",err, "\n\n", string(debug.Stack()))
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			}
 		}()

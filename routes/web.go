@@ -1,5 +1,7 @@
 package routes
-import "net/http"
+import (
+	"github.com/julienschmidt/httprouter"
+)
 
 type HttpMethod string
 
@@ -16,7 +18,7 @@ type WebRoute struct {
 	name string
 	path string
 	method HttpMethod
-	handler http.HandlerFunc
+	handler httprouter.Handle
 }
 
 func (n *WebRoute) GetName() string {
@@ -31,11 +33,11 @@ func (n *WebRoute) GetMethod() string {
 	return string(n.method)
 }
 
-func (n *WebRoute) GetHandler() http.HandlerFunc {
+func (n *WebRoute) GetHandler() httprouter.Handle {
 	return n.handler
 }
 
-func NewWebRoute(name string, pathStr string, method HttpMethod, handlerFun http.HandlerFunc) *WebRoute {
+func NewWebRoute(name string, pathStr string, method HttpMethod, handlerFun httprouter.Handle) *WebRoute {
 	return &WebRoute{
 		name: name,
 		path: pathStr,

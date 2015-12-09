@@ -1,10 +1,10 @@
 package controllers
 import (
 	"github.com/byrnedo/apibase/routes"
-	"github.com/gorilla/mux"
-	"net/http"
+	"github.com/julienschmidt/httprouter"
 	"encoding/json"
 	. "github.com/byrnedo/apibase/logger"
+	"net/http"
 )
 
 
@@ -13,13 +13,9 @@ type WebController interface {
 }
 
 // Registers an array of route handlers to gorilla/mux
-func RegisterMuxRoutes(rtr *mux.Router, controller WebController) {
+func RegisterRoutes(rtr *httprouter.Router, controller WebController) {
 	for _, route := range controller.GetRoutes() {
-		rtr.
-		Methods(route.GetMethod()).
-		Path(route.GetPath()).
-		Name(route.GetName()).
-		Handler(route.GetHandler())
+		rtr.Handle(route.GetMethod(), route.GetPath(), route.GetHandler())
 	}
 }
 
