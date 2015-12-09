@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	. "github.com/byrnedo/apibase/logger"
 	"net/http"
+	"strings"
+	"strconv"
+	"errors"
 )
 
 
@@ -21,9 +24,9 @@ func RegisterRoutes(rtr *httprouter.Router, controller WebController) {
 
 
 // Controller with json helpers
-type JsonController struct {}
-
-
+type JsonController struct {
+	BaseController
+}
 
 // Serve standard 200
 func (jC *JsonController) Serve(w http.ResponseWriter, data interface{}) {
@@ -41,4 +44,35 @@ func (jC *JsonController) ServeWithStatus(w http.ResponseWriter, data interface{
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	w.Write(bytes)
+}
+
+type BaseController struct {}
+
+// Gets first query string value as int
+func (bC *BaseController) QueryInt(r *http.Request, param string) (int, error) {
+	if vals := r.URL.Query()[param]; len(vals) > 0 {
+		return strconv.Atoi(vals[0])
+	}
+	return 0, errors.New("Not found")
+}
+
+// Makes a map from a query string parameter formatted so that
+// a query string like ?query=field:val&query=field:val2 becomes
+// map[string]string{"field": {
+// 		"val",
+//		"val2",
+// }
+func (bC *BaseController) QueryMap(r *http.Request, param string) (map[string]string) {
+	mapData := make(map[string]string,0)
+	if vals := r.URL.Query()[param]; len(vals) > 0 {
+		for _, unsplitKeyVal := range vals {
+			keyVal := strings.SplitN(unsplitKeyVal, ":", 1)
+			if len(keyVal) > 1 {
+				mapData[keyVal[0]] = keyVal[1]
+			} else {
+				mapData[keyVal[0]] = ""
+			}
+		}
+	}
+	return mapData
 }
