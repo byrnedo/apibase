@@ -1,6 +1,7 @@
 package natsio
 
 import (
+	. "github.com/byrnedo/apibase/natsio/protobuf"
 	"github.com/apcera/nats"
 	"github.com/byrnedo/apibase/dockertest"
 	gDoc "github.com/fsouza/go-dockerclient"
@@ -19,14 +20,20 @@ var (
 	natsContainer string
 )
 
-type TestPayload struct {
-	Data string
+type WithNatsContext interface {
+	Context() *NatsContext
 }
 
-type TestRequest struct {
-	NatsDTO
-	Data TestPayload
+type Wrap struct {
+	WithNatsContext
 }
+
+type Func
+
+func WrapMessage(msg WithNatsContext) *Wrap {
+	return Wrap{msg}
+}
+
 
 func setup() {
 	var (
@@ -69,26 +76,27 @@ func TestNewNatsConnect(t *testing.T) {
 		return
 	}
 
-	var handler = func(subj string, reply string, testData *TestRequest) {
+
+	var handler = func(subj string, reply string, testData *TestMessage) {
 		t.Logf("Got message on nats: %+v", testData)
 		//EncCon is nil at this point but that's ok
 		//since it wont get called until after connecting
 		//when it will then get a ping message.
-		natsCon.Publish(reply, &TestRequest{
-			NatsDTO: NatsDTO{
-				NatsCtx: testData.NatsCtx,
-				Error:   nil,
+		data := "Pong"
+		natsCon.Publish(reply, &TestMessage{
+			Context: &NatsContext{
 			},
-			Data: TestPayload{"Pong"},
+			Data: &data,
 		})
 	}
 
 	natsCon.Subscribe("test.a", handler)
 
-	response := TestRequest{}
-	request := &TestRequest{
-		NatsDTO: NatsDTO{},
-		Data:    TestPayload{"Ping"},
+	data := "Ping"
+	response := TestMessage{}
+	request := &TestMessage{
+		Context: &NatsContext{},
+		Data:   &data,
 	}
 	err = natsCon.Request("test.a", request, &response, 2*time.Second)
 
@@ -99,13 +107,13 @@ func TestNewNatsConnect(t *testing.T) {
 		return
 	}
 
-	if len(response.NatsCtx.AppTrail) != 2 {
-		t.Errorf("App trail len is %d, expected 2\n", len(response.NatsCtx.AppTrail))
+	if len(response.Context.Trail) != 2 {
+		t.Errorf("App trail len is %d, expected 2\n", len(response.Context.Trail))
 		return
 	}
 
-	if response.NatsCtx.TraceID != request.NatsCtx.TraceID {
-		t.Errorf("Request and response trace id differs\nExpected %s\nReceived %s\n", request.NatsCtx.TraceID, response.NatsCtx.TraceID)
+	if *response.Context.TraceId != *request.Context.TraceId {
+		t.Errorf("Request and response trace id differs\nExpected %s\nReceived %s\n", *request.Context.TraceId, *response.Context.TraceId)
 	}
 
 	natsCon.UnsubscribeAll()

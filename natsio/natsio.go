@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/apcera/nats"
 	"github.com/pborman/uuid"
+	. "github.com/byrnedo/apibase/natsio/protobuf"
 	"time"
 )
 
@@ -35,21 +36,25 @@ func (n *Nats) QueueSubscribe(route string, group string, handler nats.Handler) 
 
 // For use when using nats request/publish/publishrequest wrapper functions
 type PayloadWithContext interface {
-	Context() *NatsContext
-	NewContext(*NatsContext)
+	GetContext() *NatsContext
+	SetContext(*NatsContext)
 }
 
 // Adds a context if it doesn't exist. Otherwise appends which app and time
 // that this message is being sent at.
 // Adds a traceID if not already there
 func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
-	if data.Context() == nil {
-		data.NewContext(&NatsContext{})
+
+	ctx := data.GetContext()
+	if ctx == nil {
+		data.SetContext(&NatsContext{})
 	}
-	if len(data.Context().TraceID) == 0 {
-		data.Context().TraceID = uuid.NewUUID().String()
+	if len(ctx.GetTraceId()) == 0 {
+		newId := uuid.NewUUID().String()
+		ctx.TraceId = &newId
 	}
-	data.Context().appendTrail(n.Opts.Name, requestType)
+	timeNow := time.Now().Unix()
+	ctx.Trail = append(ctx.Trail, &Trail{&(n.Opts.Name), &requestType, &timeNow, nil})
 }
 
 // Wrapper for nats Publish function. Needs a payload which has
@@ -58,7 +63,7 @@ func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
 // that this message is being sent at.
 // Adds a traceID if not already there
 func (n *Nats) Publish(subject string, data PayloadWithContext) error {
-	n.updateContext(data, Publish)
+	n.updateContext(data, RequestType_PUB)
 	return n.EncCon.Publish(subject, data)
 }
 
@@ -67,7 +72,7 @@ func (n *Nats) Publish(subject string, data PayloadWithContext) error {
 // that this message is being sent at.
 // Adds a traceID if not already there
 func (n *Nats) PublishRequest(subject string, reply string, data PayloadWithContext) error {
-	n.updateContext(data, PublishRequest)
+	n.updateContext(data, RequestType_PUBREQ)
 	return n.EncCon.PublishRequest(subject, reply, data)
 }
 
@@ -76,7 +81,7 @@ func (n *Nats) PublishRequest(subject string, reply string, data PayloadWithCont
 // that this message is being sent at.
 // Adds a traceID if not already there
 func (n *Nats) Request(subject string, data PayloadWithContext, responsePtr interface{}, timeout time.Duration) error {
-	n.updateContext(data, Request)
+	n.updateContext(data, RequestType_REQ)
 	return n.EncCon.Request(subject, data, responsePtr, timeout)
 }
 

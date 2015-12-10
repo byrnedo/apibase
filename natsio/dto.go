@@ -4,45 +4,45 @@ import (
 	"time"
 )
 
-type RequestType string
+type RequestTypeOld string
 
 const (
-	Publish        RequestType = "PUB"
-	PublishRequest RequestType = "PUBREQ"
-	Request        RequestType = "REQ"
+	Publish        RequestTypeOld = "PUB"
+	PublishRequest RequestTypeOld = "PUBREQ"
+	Request        RequestTypeOld = "REQ"
 )
 
 // Holder for trail of requests between services
-type Trail struct {
+type TrailOld struct {
 	AppName string
-	PutType RequestType
+	PutType RequestTypeOld
 	Time    time.Time
 }
 
 // Holds info about a chain of nats requests.
-type NatsContext struct {
-	AppTrail []Trail
+type NatsContextOld struct {
+	AppTrail []TrailOld
 	TraceID  string
 }
 
 // Adds another link in the trail.
-func (n *NatsContext) appendTrail(appName string, requestType RequestType) {
-	n.AppTrail = append(n.AppTrail, Trail{appName, requestType, time.Now()})
+func (n *NatsContextOld) appendTrail(appName string, requestType RequestTypeOld) {
+	n.AppTrail = append(n.AppTrail, TrailOld{appName, requestType, time.Now()})
 }
 
 // Struct used in natsio calls for request/publish. Holds context
 // and an error field
 type NatsDTO struct {
-	NatsCtx NatsContext
+	NatsCtx NatsContextOld
 	Error   error
 }
 
 // Retrieve a pointer to the context object
-func (n *NatsDTO) Context() *NatsContext {
+func (n *NatsDTO) Context() *NatsContextOld {
 	return &n.NatsCtx
 }
 
 // Replace the context on a message
-func (n *NatsDTO) NewContext(nC *NatsContext) {
+func (n *NatsDTO) NewContext(nC *NatsContextOld) {
 	n.NatsCtx = *nC
 }
