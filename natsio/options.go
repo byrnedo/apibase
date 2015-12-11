@@ -1,8 +1,9 @@
 package natsio
 
 import (
-	"github.com/apcera/nats"
+	"github.com/nats-io/nats"
 	"time"
+	"github.com/nats-io/nats/encoders/protobuf"
 )
 
 // Used to create a nats connection.
@@ -69,8 +70,9 @@ func (n *NatsOptions) GetRoutes() []*Route {
 	return n.routes
 }
 
+
 func setDefaultOptions(options *NatsOptions) error {
-	options.encoding = nats.DEFAULT_ENCODER
+	options.encoding = protobuf.PROTOBUF_ENCODER
 	options.MaxReconnect = 5
 	options.ReconnectWait = (2 * time.Second)
 	options.Timeout = (10 * time.Second)

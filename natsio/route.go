@@ -1,6 +1,6 @@
 package natsio
 
-import "github.com/apcera/nats"
+import "github.com/nats-io/nats"
 
 // Holds route info including subscription
 // holds route,handler,nats subscripiton and queue group.

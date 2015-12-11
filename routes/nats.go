@@ -1,6 +1,6 @@
 package routes
 
-import "github.com/apcera/nats"
+import "github.com/nats-io/nats"
 
 // Holder for a nats route's info.
 type NatsRoute struct {

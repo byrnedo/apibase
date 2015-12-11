@@ -2,13 +2,14 @@ package natsio
 
 import (
 	. "github.com/byrnedo/apibase/natsio/protobuf"
-	"github.com/apcera/nats"
+	"github.com/nats-io/nats"
 	"github.com/byrnedo/apibase/dockertest"
 	gDoc "github.com/fsouza/go-dockerclient"
 	"os"
 	"reflect"
 	"testing"
 	"time"
+	"github.com/nats-io/nats/encoders/protobuf"
 )
 
 const (
@@ -20,18 +21,16 @@ var (
 	natsContainer string
 )
 
-type WithNatsContext interface {
-	Context() *NatsContext
-}
-
 type Wrap struct {
-	WithNatsContext
+	*TestMessage
 }
 
-type Func
+func (w *Wrap) SetContext(ctx *NatsContext) {
+	w.Context = ctx
+}
 
-func WrapMessage(msg WithNatsContext) *Wrap {
-	return Wrap{msg}
+func WrapMessage(msg *TestMessage) *Wrap {
+	return &Wrap{msg}
 }
 
 
@@ -39,6 +38,7 @@ func setup() {
 	var (
 		err error
 	)
+	nats.RegisterEncoder(protobuf.PROTOBUF_ENCODER, &protobuf.ProtobufEncoder{})
 
 	if natsContainer, err = dockertest.Running(NatsImage); err != nil || len(natsContainer) == 0 {
 		if natsContainer, err = dockertest.Start(NatsImage, map[gDoc.Port][]gDoc.PortBinding{
@@ -83,11 +83,9 @@ func TestNewNatsConnect(t *testing.T) {
 		//since it wont get called until after connecting
 		//when it will then get a ping message.
 		data := "Pong"
-		natsCon.Publish(reply, &TestMessage{
-			Context: &NatsContext{
-			},
+		natsCon.Publish(reply, testData.Context, WrapMessage(&TestMessage{
 			Data: &data,
-		})
+		}))
 	}
 
 	natsCon.Subscribe("test.a", handler)
@@ -98,9 +96,8 @@ func TestNewNatsConnect(t *testing.T) {
 		Context: &NatsContext{},
 		Data:   &data,
 	}
-	err = natsCon.Request("test.a", request, &response, 2*time.Second)
-
-	t.Logf("Got response on nats: %+v", response)
+	err = natsCon.Request("test.a", &NatsContext{}, WrapMessage(request), &response, 2*time.Second)
+	t.Logf("Got response on nats: %+v", &response)
 
 	if err != nil {
 		t.Error("Failed to get response:" + err.Error())
@@ -202,7 +199,6 @@ func setupConnection() *NatsOptions {
 	return NewNatsOptions(func(n *NatsOptions) error {
 		n.Url = "nats://localhost:" + NatsPort
 		n.Name = "it_test"
-		n.SetEncoding(nats.JSON_ENCODER)
 		n.Timeout = 10 * time.Second
 		return nil
 	})
