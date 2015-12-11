@@ -102,3 +102,15 @@ func (bC *BaseController) AcceptsHtml(r *http.Request) bool {
 func (bC *BaseController) AcceptsXml(r *http.Request) bool {
 	return acceptsXmlRegex.MatchString(r.Header.Get("Accept"))
 }
+
+func (bC *BaseController) SendsJson(r *http.Request) bool {
+	return acceptsJsonRegex.MatchString(r.Header.Get("Content-Type"))
+}
+
+func (bC *BaseController) SendsHtml(r *http.Request) bool {
+	return acceptsHtmlRegex.MatchString(r.Header.Get("Content-Type"))
+}
+
+func (bC *BaseController) SendsXml(r *http.Request) bool {
+	return acceptsXmlRegex.MatchString(r.Header.Get("Content-Type"))
+}
