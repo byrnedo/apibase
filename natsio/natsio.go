@@ -3,6 +3,7 @@ package natsio
 import (
 	"errors"
 	"github.com/nats-io/nats"
+	"github.com/golang/protobuf/proto"
 	"github.com/pborman/uuid"
 	. "github.com/byrnedo/apibase/natsio/protobuf"
 	"time"
@@ -36,6 +37,7 @@ func (n *Nats) QueueSubscribe(route string, group string, handler nats.Handler) 
 
 // For use when using nats request/publish/publishrequest wrapper functions
 type PayloadWithContext interface {
+	proto.Message
 	GetContext() *NatsContext
 	SetContext(*NatsContext)
 }
@@ -56,6 +58,7 @@ func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
 	}
 	timeNow := time.Now().Unix()
 	ctx.Trail = append(ctx.Trail, &Trail{&(n.Opts.Name), &requestType, &timeNow, nil})
+
 }
 
 // Wrapper for nats Publish function. Needs a payload which has

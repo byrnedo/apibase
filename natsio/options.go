@@ -39,6 +39,9 @@ func NewNatsOptions(optionFuncs ...OptionsFunc) (options *NatsOptions) {
 func (n *NatsOptions) SetEncoding(enc string) {
 	n.encoding = enc
 }
+func (n *NatsOptions) GetEncoding() string {
+	return n.encoding
+}
 
 func (n *NatsOptions) setOptions(optionFuncs ...OptionsFunc) error {
 	for _, opt := range optionFuncs {
