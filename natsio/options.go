@@ -2,8 +2,8 @@ package natsio
 
 import (
 	"github.com/nats-io/nats"
-	"time"
 	"github.com/nats-io/nats/encoders/protobuf"
+	"time"
 )
 
 // Used to create a nats connection.
@@ -72,7 +72,6 @@ func (natsOpts *NatsOptions) Connect() (natsObj *Nats, err error) {
 func (n *NatsOptions) GetRoutes() []*Route {
 	return n.routes
 }
-
 
 func setDefaultOptions(options *NatsOptions) error {
 	options.encoding = protobuf.PROTOBUF_ENCODER

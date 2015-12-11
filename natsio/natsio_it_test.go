@@ -1,15 +1,15 @@
 package natsio
 
 import (
-	. "github.com/byrnedo/apibase/natsio/protobuf"
-	"github.com/nats-io/nats"
 	"github.com/byrnedo/apibase/dockertest"
+	. "github.com/byrnedo/apibase/natsio/protobuf"
 	gDoc "github.com/fsouza/go-dockerclient"
+	"github.com/nats-io/nats"
+	"github.com/nats-io/nats/encoders/protobuf"
 	"os"
 	"reflect"
 	"testing"
 	"time"
-	"github.com/nats-io/nats/encoders/protobuf"
 )
 
 const (
@@ -32,7 +32,6 @@ func (w *Wrap) SetContext(ctx *NatsContext) {
 func WrapMessage(msg *TestMessage) *Wrap {
 	return &Wrap{msg}
 }
-
 
 func setup() {
 	var (
@@ -76,7 +75,6 @@ func TestNewNatsConnect(t *testing.T) {
 		return
 	}
 
-
 	var handler = func(subj string, reply string, testData *TestMessage) {
 		t.Logf("Got message on nats: %+v", testData)
 		//EncCon is nil at this point but that's ok
@@ -94,7 +92,7 @@ func TestNewNatsConnect(t *testing.T) {
 	response := TestMessage{}
 	request := &TestMessage{
 		Context: &NatsContext{},
-		Data:   &data,
+		Data:    &data,
 	}
 	err = natsCon.Request("test.a", &NatsContext{}, WrapMessage(request), &response, 2*time.Second)
 	t.Logf("Got response on nats: %+v", &response)

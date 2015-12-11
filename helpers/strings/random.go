@@ -1,7 +1,8 @@
 package strings
+
 import (
-	"time"
 	"math/rand"
+	"time"
 )
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-?.,#/\\"

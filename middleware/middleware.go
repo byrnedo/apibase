@@ -21,7 +21,7 @@ func LogTime(next http.Handler) http.Handler {
 		if forIps := r.Header.Get("x-forwarded-for"); len(forIps) > 0 {
 			ips = forIps
 		} else {
-			ips= r.RemoteAddr
+			ips = r.RemoteAddr
 		}
 		Info.Printf("%s -> [%s] %q %v \n", ips, r.Method, r.URL.Path, duration)
 	})

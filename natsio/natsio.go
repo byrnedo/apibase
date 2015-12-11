@@ -2,8 +2,8 @@ package natsio
 
 import (
 	"errors"
-	"github.com/nats-io/nats"
 	"github.com/golang/protobuf/proto"
+	"github.com/nats-io/nats"
 	"github.com/pborman/uuid"
 	. "github.com/byrnedo/apibase/natsio/protobuf"
 	"time"

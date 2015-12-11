@@ -9,17 +9,9 @@ import (
 	"time"
 )
 
-// Mongo session holder
-var session *mgo.Session
-
-// Get a connection from the session
-func Conn() *mgo.Session {
-	return session.Copy()
-}
-
 // Dial up to mongo using the "mongodb-url" from the app.conf
 // First checks for environent variable GOAX_MONGODB_URL
-func Init(url string, debugLog *log.Logger) {
+func Init(url string, debugLog *log.Logger) *mgo.Session {
 
 	if debugLog != nil {
 		mgo.SetDebug(true)
@@ -31,8 +23,8 @@ func Init(url string, debugLog *log.Logger) {
 		panic(err)
 	}
 
-	session = sess
-	session.SetMode(mgo.Monotonic, true)
+	sess.SetMode(mgo.Monotonic, true)
+	return sess
 }
 
 // Makes a bson map out of a list of fields

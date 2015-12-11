@@ -1,7 +1,6 @@
 package controllers
 
 import (
-
 	"encoding/json"
 	"errors"
 	. "github.com/byrnedo/apibase/logger"
@@ -9,9 +8,9 @@ import (
 	"github.com/byrnedo/mapcast"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
-	"regexp"
 )
 
 var (
