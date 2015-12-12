@@ -12,7 +12,7 @@ func TestParse(t *testing.T) {
 	)
 
 	if tree, err = ParseFile("./test.conf"); err != nil {
-		t.Error("Failed to read ../test.conf:" + err.Error())
+		t.Error("Failed to read ./test.conf:" + err.Error())
 	}
 
 	if val, err := tree.GetConfig().GetInt("http.port"); err != nil || val != 1234 {
@@ -24,5 +24,34 @@ func TestParse(t *testing.T) {
 	}
 
 	t.Logf("Conf object after: %v", tree.GetConfig())
+
+}
+
+type MyConfig struct {
+	Http struct {
+			 Port int
+			 Host string
+			 Log struct {
+					  Level string
+				  }
+		 }
+}
+
+func TestPopulate(t *testing.T) {
+
+	var (
+		tree *parse.Tree
+		err  error
+	)
+
+	if tree, err = ParseFile("./test.conf"); err != nil {
+		t.Error("Failed to read ./test.conf:" + err.Error())
+	}
+
+	testStruct := &MyConfig{}
+
+	Populate(testStruct, tree.GetConfig())
+
+	t.Logf("After populate: %+v", testStruct)
 
 }
