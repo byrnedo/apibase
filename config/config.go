@@ -2,14 +2,14 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	"github.com/byrnedo/apibase/helpers/stringhelp"
 	"github.com/byrnedo/typesafe-config/parse"
 	"io/ioutil"
 	"reflect"
-	"strings"
 	"strconv"
-	"github.com/byrnedo/apibase/helpers/stringhelp"
+	"strings"
 )
-
 
 func ParseFile(path string) (*parse.Tree, error) {
 	bytes, err := ioutil.ReadFile(path)
@@ -26,28 +26,16 @@ func Parse(configFileData []byte) (tree *parse.Tree, err error) {
 }
 
 func Populate(targetPtr interface{}, conf *parse.Config) {
-	populate(targetPtr, conf, "")
-}
-
-func populate(targetPtr interface{}, conf *parse.Config, prefix string) {
-
-	structElems := reflect.TypeOf(targetPtr).Elem()
-	structValues := reflect.ValueOf(targetPtr).Elem()
-
-	for i := 0; i < structElems.NumField(); i++ {
-
-		configFieldName, defaultVal := configFieldNamer(structElems.Field(i), prefix)
-
-		setValue(structValues.Field(i), conf, configFieldName, defaultVal)
-	}
-	return
+	fmt.Println("Populate:", targetPtr)
+	setValue(reflect.ValueOf(targetPtr), conf, "", "")
 }
 
 func configFieldNamer(field reflect.StructField, prefix string) (name string, defaultVal string) {
 	t := field.Tag.Get("config")
 	tArr := strings.Split(t, ",")
 
-	name = stringhelp.ToDotSnakeCase(field.Name)
+	name = stringhelp.ToDashCase(field.Name)
+	fmt.Println(name)
 
 	if len(tArr) > 0 && len(tArr[0]) > 0 {
 		switch tArr[0] {
@@ -62,14 +50,31 @@ func configFieldNamer(field reflect.StructField, prefix string) (name string, de
 		defaultVal = tArr[1]
 	}
 
-	return prefix + "." + name, defaultVal
+	if len(prefix) > 0 {
+		prefix = prefix + "."
+	}
+	fmt.Println("Field name: " + prefix + name)
+	return prefix + name, defaultVal
 }
 
 func setValue(field reflect.Value, conf *parse.Config, configName string, defaultVal string) {
-	switch field.Kind(){
+	if field.Kind() != reflect.Ptr {
+		panic("Not a pointer value " + field.Kind().String())
+	}
+
+	field = reflect.Indirect(field)
+	if !field.CanSet() {
+		return
+	}
+	switch field.Kind() {
 	case reflect.Struct:
-		fieldPtr := field.InterfaceData()
-		populate(fieldPtr, conf, configName)
+		itemType := reflect.TypeOf(field.Interface())
+
+		for i := 0; i < field.NumField(); i++ {
+			configFieldName, defaultVal := configFieldNamer(itemType.Field(i), configName)
+
+			setValue(field.Field(i).Addr(), conf, configFieldName, defaultVal)
+		}
 	case reflect.Ptr:
 	case reflect.Bool:
 		defaultBool, _ := strconv.ParseBool(defaultVal)
@@ -130,5 +135,3 @@ func setValue(field reflect.Value, conf *parse.Config, configName string, defaul
 	}
 
 }
-
-

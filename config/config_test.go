@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/byrnedo/typesafe-config/parse"
 	"testing"
+	"fmt"
 )
 
 func TestParse(t *testing.T) {
@@ -28,13 +29,24 @@ func TestParse(t *testing.T) {
 }
 
 type MyConfig struct {
-	Http struct {
-			 Port int
-			 Host string
-			 Log struct {
-					  Level string
-				  }
-		 }
+	SectionA struct {
+		Int int
+		Uint uint
+		Int32 int32
+		Int64 int64
+		Float32 float32
+		Float64 float64
+		String string
+		SectionB  struct {
+			Int int
+			Uint uint
+			Int32 int32
+			Int64 int64
+			Float32 float32
+			Float64 float64
+			String string `config:"strong-string"`
+		}
+	}
 }
 
 func TestPopulate(t *testing.T) {
@@ -53,5 +65,10 @@ func TestPopulate(t *testing.T) {
 	Populate(testStruct, tree.GetConfig())
 
 	t.Logf("After populate: %+v", testStruct)
+	if fmt.Sprintf("%+v", testStruct) != "&{SectionA:{Int:-999 Uint:999 Int32:-999 Int64:999 Float32:999.999 Float64:999.999 String:lalala SectionB:{Int:-999 Uint:999 Int32:-999 Int64:999 Float32:999.999 Float64:999.999 String:lalala}}}" {
+		t.Logf("Got: %+v", testStruct)
+		t.Error("Not as expected.")
+	}
+
 
 }

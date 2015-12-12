@@ -1,7 +1,7 @@
 package defaultmongo
 
 import (
-	"github.com/byrnedo/apibase/config"
+	"github.com/byrnedo/apibase/config/defaultconfig"
 	"github.com/byrnedo/apibase/db/mongo"
 	"github.com/byrnedo/apibase/helpers/envhelp"
 	. "github.com/byrnedo/apibase/logger"
@@ -18,7 +18,7 @@ func Conn() *mgo.Session {
 
 func init() {
 
-	mongoUrl := envhelp.GetOr("MONGO_URL", config.Conf.GetDefaultString("mongo.url", ""))
+	mongoUrl := envhelp.GetOr("MONGO_URL", defaultconfig.Conf.GetDefaultString("mongo.url", ""))
 	Info.Println("Attempting to connect to [" + mongoUrl + "]")
 
 	session = mongo.Init(mongoUrl, Trace)

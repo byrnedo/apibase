@@ -1,12 +1,12 @@
 package defaultconfig
+
 import (
-	"github.com/byrnedo/typesafe-config/parse"
 	"flag"
 	"fmt"
-	"os"
 	"github.com/byrnedo/apibase/config"
+	"github.com/byrnedo/typesafe-config/parse"
+	"os"
 )
-
 
 var (
 	configPath string

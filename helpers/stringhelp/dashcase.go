@@ -1,24 +1,15 @@
 package stringhelp
+
 import (
-	"unicode/utf8"
 	"bytes"
 	"unicode"
+	"unicode/utf8"
 )
 
 //
 // Copyright (c) 2015 Huan Du
 // Modifications: 2015 Donal Byrne
-// ToDotSnakeCase can convert all upper case characters in a string to
-// dot separated format.
-//
-// Some samples.
-//     "FirstName"  => "first.name"
-//     "HTTPServer" => "http.server"
-//     "NoHTTPS"    => "no.https"
-//     "GO_PATH"    => "go.path"
-//     "GO PATH"    => "go.path"      // space is converted to underscore.
-//     "GO-PATH"    => "go.path"      // hyphen is converted to underscore.
-func ToDotSnakeCase(str string) string {
+func ToDashCase(str string) string {
 	if len(str) == 0 {
 		return ""
 	}
@@ -27,7 +18,7 @@ func ToDotSnakeCase(str string) string {
 	var prev, r0, r1 rune
 	var size int
 
-	r0 = '_'
+	r0 = '-'
 
 	for len(str) > 0 {
 		prev = r0
@@ -39,8 +30,8 @@ func ToDotSnakeCase(str string) string {
 			buf.WriteByte(byte(str[0]))
 
 		case unicode.IsUpper(r0):
-			if prev != '_' {
-				buf.WriteRune('_')
+			if prev != '-' {
+				buf.WriteRune('-')
 			}
 
 			buf.WriteRune(unicode.ToLower(r0))
@@ -74,11 +65,11 @@ func ToDotSnakeCase(str string) string {
 
 				if !unicode.IsUpper(r0) {
 					if r0 == '_' || r0 == ' ' || r0 == '-' {
-						r0 = '_'
+						r0 = '-'
 
 						buf.WriteRune(unicode.ToLower(r1))
 					} else {
-						buf.WriteRune('_')
+						buf.WriteRune('-')
 						buf.WriteRune(unicode.ToLower(r1))
 						buf.WriteRune(r0)
 					}
@@ -89,14 +80,14 @@ func ToDotSnakeCase(str string) string {
 				buf.WriteRune(unicode.ToLower(r1))
 			}
 
-			if len(str) == 0 || r0 == '_' {
+			if len(str) == 0 || r0 == '-' {
 				buf.WriteRune(unicode.ToLower(r0))
 				break
 			}
 
 		default:
-			if r0 == ' ' || r0 == '-' {
-				r0 = '_'
+			if r0 == ' ' || r0 == '_' {
+				r0 = '-'
 			}
 
 			buf.WriteRune(r0)
