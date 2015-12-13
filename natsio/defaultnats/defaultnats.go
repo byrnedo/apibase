@@ -14,9 +14,9 @@
 package defaultnats
 
 import (
-	"github.com/byrnedo/apibase/config/defaultconfig"
 	. "github.com/byrnedo/apibase/logger"
 	"github.com/byrnedo/apibase/natsio"
+	"github.com/byrnedo/typesafe-config/parse"
 	"github.com/byrnedo/apibase/config"
 )
 
@@ -26,7 +26,7 @@ func init() {
 
 	natsOpts := natsio.NewNatsOptions(func(n *natsio.NatsOptions) error { return nil; })
 
-	config.Populate(&natsOpts.Options, defaultconfig.Conf, "nats")
+	parse.Populate(&natsOpts.Options, config.Conf, "nats")
 
 	Info.Printf("Nats options: %#v", natsOpts)
 

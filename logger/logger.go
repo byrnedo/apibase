@@ -2,7 +2,7 @@ package logger
 
 import (
 	"fmt"
-	"github.com/byrnedo/apibase/config/defaultconfig"
+	"github.com/byrnedo/apibase/config"
 	"io"
 	"io/ioutil"
 	"log"
@@ -36,11 +36,11 @@ func init() {
 		err         error
 	)
 
-	if logFilePath, err = defaultconfig.Conf.GetString("log.file"); err != nil {
+	if logFilePath, err = config.Conf.GetString("log.file"); err != nil {
 		fmt.Println("No log-file config var, logging to std out/err")
 	}
 
-	lvl := defaultconfig.Conf.GetDefaultString("log.level", "info")
+	lvl := config.Conf.GetDefaultString("log.level", "info")
 	switch lvl {
 	case "trace":
 		logLevel = TraceLevel

@@ -6,10 +6,10 @@ package defaultmongo
 
 import (
 	"github.com/byrnedo/apibase/config"
-	"github.com/byrnedo/apibase/config/defaultconfig"
 	"github.com/byrnedo/apibase/db/mongo"
 	. "github.com/byrnedo/apibase/logger"
 	"gopkg.in/mgo.v2"
+	"github.com/byrnedo/typesafe-config/parse"
 )
 
 // Mongo session holder
@@ -23,7 +23,7 @@ func Conn() *mgo.Session {
 func init() {
 
 	mConf := &mongo.MongoConf{}
-	config.Populate(mConf, defaultconfig.Conf, "mongo")
+	parse.Populate(mConf, config.Conf, "mongo")
 	Info.Println("Mongo config:", mConf)
 
 	Info.Println("Attempting to connect to [" + mConf.Url + "]")

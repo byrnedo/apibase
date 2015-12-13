@@ -2,12 +2,11 @@
 // Config file is loaded according to -conf flag.
 // Falls back to conf/app.conf location.
 //
-package defaultconfig
+package config
 
 import (
 	"flag"
 	"fmt"
-	"github.com/byrnedo/apibase/config"
 	"github.com/byrnedo/typesafe-config/parse"
 	"os"
 )
@@ -26,7 +25,7 @@ func init() {
 		configPath = "conf/app.conf"
 	}
 
-	tree, err := config.ParseFile(configPath)
+	tree, err := parse.ParseFile(configPath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error parsing config file:"+err.Error())
 		os.Exit(1)
