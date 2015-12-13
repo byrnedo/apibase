@@ -1,3 +1,7 @@
+// This package provides a default config init.
+// Config file is loaded according to -conf flag.
+// Falls back to conf/app.conf location.
+//
 package defaultconfig
 
 import (

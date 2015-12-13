@@ -9,6 +9,38 @@ import (
 	"time"
 )
 
+// Structure for mongo config section
+// would look like this in the conf file:
+//
+//mongo {
+//    url = "mongodb://localhost:27017"
+//    connect-timeout = 10
+//    debug = false
+//}
+type MongoConf struct {
+		Url            string `config:"url"`
+		ConnectTimeout int    `config:"connect-timeout,10"`
+		Debug          bool
+}
+
+// Dial up to mongo using the "mongodb-url" from the app.conf
+// First checks for environent variable GOAX_MONGODB_URL
+func InitFromConfig(conf *MongoConf, debugLog *log.Logger) *mgo.Session {
+
+	if debugLog != nil {
+		mgo.SetDebug(conf.Debug)
+		mgo.SetLogger(debugLog)
+	}
+
+	sess, err := mgo.DialWithTimeout(conf.Url, time.Duration(conf.ConnectTimeout)*time.Second)
+	if err != nil {
+		panic(err)
+	}
+
+	sess.SetMode(mgo.Monotonic, true)
+	return sess
+}
+
 // Dial up to mongo using the "mongodb-url" from the app.conf
 // First checks for environent variable GOAX_MONGODB_URL
 func Init(url string, debugLog *log.Logger) *mgo.Session {

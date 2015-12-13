@@ -1,9 +1,13 @@
+// This package provides a default mongo init.
+// Configuration is loaded from config file under 'mongo' section
+//
+// See MongoConf docs for example config
 package defaultmongo
 
 import (
+	"github.com/byrnedo/apibase/config"
 	"github.com/byrnedo/apibase/config/defaultconfig"
 	"github.com/byrnedo/apibase/db/mongo"
-	"github.com/byrnedo/apibase/helpers/envhelp"
 	. "github.com/byrnedo/apibase/logger"
 	"gopkg.in/mgo.v2"
 )
@@ -18,8 +22,11 @@ func Conn() *mgo.Session {
 
 func init() {
 
-	mongoUrl := envhelp.GetOr("MONGO_URL", defaultconfig.Conf.GetDefaultString("mongo.url", ""))
-	Info.Println("Attempting to connect to [" + mongoUrl + "]")
+	mConf := &mongo.MongoConf{}
+	config.Populate(mConf, defaultconfig.Conf, "mongo")
+	Info.Println("Mongo config:", mConf)
 
-	session = mongo.Init(mongoUrl, Trace)
+	Info.Println("Attempting to connect to [" + mConf.Url + "]")
+
+	session = mongo.InitFromConfig(mConf, Trace)
 }
