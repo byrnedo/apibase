@@ -8,8 +8,8 @@ import (
 	"github.com/byrnedo/apibase/config"
 	"github.com/byrnedo/apibase/db/mongo"
 	. "github.com/byrnedo/apibase/logger"
-	"gopkg.in/mgo.v2"
 	"github.com/byrnedo/typesafe-config/parse"
+	"gopkg.in/mgo.v2"
 )
 
 // Mongo session holder

@@ -1,8 +1,6 @@
 package logger
 
 import (
-	"fmt"
-	"github.com/byrnedo/apibase/config"
 	"io"
 	"io/ioutil"
 	"log"
@@ -29,35 +27,26 @@ const (
 	ErrorLevel LogLevel = 3
 )
 
-func init() {
-	var (
-		logLevel    LogLevel
-		logFilePath string
-		err         error
-	)
+func init(){
 
-	if logFilePath, err = config.Conf.GetString("log.file"); err != nil {
-		fmt.Println("No log-file config var, logging to std out/err")
-	}
+	Trace = log.New(ioutil.Discard,
+		"TRACE: ",
+		logFormat )
 
-	lvl := config.Conf.GetDefaultString("log.level", "info")
-	switch lvl {
-	case "trace":
-		logLevel = TraceLevel
-	case "info":
-		logLevel = InfoLevel
-	case "warn":
-		logLevel = WarnLevel
-	case "error":
-		logLevel = ErrorLevel
-	default:
-		panic("Unknown log level given:" + lvl)
-	}
+	Info = log.New(os.Stdout,
+		"INFO: ",
+		logFormat)
 
-	createLogger(logFilePath, logLevel)
+	Warning = log.New(os.Stdout,
+		"WARNING: ",
+		logFormat)
+
+	Error = log.New(os.Stderr,
+		"ERROR: ",
+		logFormat)
 }
 
-func createLogger(logFilePath string, logLevel LogLevel) {
+func InitFileLog(logFilePath string, logLevel LogLevel) {
 	var (
 		logWriter    io.Writer
 		errLogWriter io.Writer
@@ -71,6 +60,8 @@ func createLogger(logFilePath string, logLevel LogLevel) {
 			if err != nil {
 				panic("Failed to open log file " + logFilePath + ":" + err.Error())
 			}
+
+			Info.Println("Initializing file logger, path:" + logFilePath)
 			logWriter = file
 			errLogWriter = file
 			defer file.Close()
@@ -115,6 +106,7 @@ func (options *LogOptions) seedDefaults() {
 }
 
 func InitLog(optFunc func(*LogOptions)) {
+	Info.Println("Initializing logger")
 	var options = &LogOptions{}
 	options.seedDefaults()
 	optFunc(options)

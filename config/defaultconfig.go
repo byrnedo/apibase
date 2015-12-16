@@ -6,9 +6,7 @@ package config
 
 import (
 	"flag"
-	"fmt"
 	"github.com/byrnedo/typesafe-config/parse"
-	"os"
 )
 
 var (
@@ -27,8 +25,8 @@ func init() {
 
 	tree, err := parse.ParseFile(configPath)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error parsing config file:"+err.Error())
-		os.Exit(1)
+
+		panic("Error parsing config file: " + err.Error())
 	}
 	Conf = tree.GetConfig()
 }

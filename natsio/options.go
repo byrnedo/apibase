@@ -52,7 +52,7 @@ func (n *NatsOptions) setOptions(optionFuncs ...OptionsFunc) error {
 	return nil
 }
 
-// Start subscribing to subjects/routes. This is non blocking.
+// Start subscribing to subjects/routes.
 func (natsOpts *NatsOptions) Connect() (natsObj *Nats, err error) {
 	if len(natsOpts.Name) == 0 {
 		panic("Must set Name in NatsOptions")

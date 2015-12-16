@@ -18,9 +18,9 @@ import (
 //    debug = false
 //}
 type MongoConf struct {
-		Url            string `config:"url"`
-		ConnectTimeout int    `config:"connect-timeout,10"`
-		Debug          bool
+	Url            string `config:"url"`
+	ConnectTimeout int    `config:"connect-timeout,10"`
+	Debug          bool
 }
 
 // Dial up to mongo using the "mongodb-url" from the app.conf

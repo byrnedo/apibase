@@ -14,17 +14,18 @@
 package defaultnats
 
 import (
+	"github.com/byrnedo/apibase/config"
+	_ "github.com/byrnedo/apibase/logger/defaultlogger"
 	. "github.com/byrnedo/apibase/logger"
 	"github.com/byrnedo/apibase/natsio"
 	"github.com/byrnedo/typesafe-config/parse"
-	"github.com/byrnedo/apibase/config"
 )
 
 var Conn *natsio.Nats
 
 func init() {
 
-	natsOpts := natsio.NewNatsOptions(func(n *natsio.NatsOptions) error { return nil; })
+	natsOpts := natsio.NewNatsOptions(func(n *natsio.NatsOptions) error { return nil })
 
 	parse.Populate(&natsOpts.Options, config.Conf, "nats")
 
