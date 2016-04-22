@@ -7,6 +7,7 @@ package config
 import (
 	"flag"
 	"github.com/byrnedo/typesafe-config/parse"
+	"os"
 )
 
 var (
@@ -17,11 +18,11 @@ var (
 
 func init() {
 	fs := flag.NewFlagSet("config", flag.ContinueOnError)
-	fs.StringVar(&configPath, "conf", "", "Configuration file path")
+	fs.Usage = func(){
 
-	if len(configPath) == 0 {
-		configPath = "conf/app.conf"
 	}
+	fs.StringVar(&configPath, "conf", "conf/app.conf", "Configuration file path")
+	fs.Parse(os.Args[1:])
 
 	tree, err := parse.ParseFile(configPath)
 	if err != nil {

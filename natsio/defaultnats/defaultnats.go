@@ -19,6 +19,7 @@ import (
 	. "github.com/byrnedo/apibase/logger"
 	"github.com/byrnedo/apibase/natsio"
 	"github.com/byrnedo/typesafe-config/parse"
+	"time"
 )
 
 var Conn *natsio.Nats
@@ -27,14 +28,28 @@ func init() {
 
 	natsOpts := natsio.NewNatsOptions(func(n *natsio.NatsOptions) error { return nil })
 
+	natsOpts.Options.MaxReconnect = 15
+
 	parse.Populate(&natsOpts.Options, config.Conf, "nats")
 
 	Info.Printf("Nats options: %#v", natsOpts)
 
-	Info.Println("Nats encoding:", natsOpts.GetEncoding())
+	encoding := config.Conf.GetDefaultString("nats.encoding", natsOpts.GetEncoding())
+
+	Info.Println("Nats encoding:", encoding)
+	natsOpts.SetEncoding(encoding)
 
 	var err error
-	Conn, err = natsOpts.Connect()
+
+	attempts := 1
+	for attempts <= 5 {
+		Conn, err = natsOpts.Connect()
+		if err == nil {
+			break
+		}
+		time.Sleep(2 * time.Second)
+	}
+
 	if err != nil {
 		panic("Failed to connect to nats:" + err.Error())
 	}
