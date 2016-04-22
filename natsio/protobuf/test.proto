@@ -1,0 +1,9 @@
+package protobuf;
+
+import "nats.proto";
+
+message TestMessage {
+    optional NatsContext context = 1;
+    optional string data = 2;
+}
+
