@@ -57,7 +57,7 @@ func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
 		ctx.TraceId = &newId
 	}
 	timeNow := time.Now().Unix()
-	ctx.Trail = append(ctx.Trail, &Trail{&(n.Opts.Name), &requestType, &timeNow, nil})
+	ctx.Trail = append(ctx.Trail, &NatsContext_Trail{&(n.Opts.Name), &requestType, &timeNow, nil})
 
 }
 

@@ -7,15 +7,15 @@
 
 	It is generated from these files:
 		nats.proto
+		test.proto
 
 	It has these top-level messages:
-		Trail
 		NatsContext
 		TestMessage
 */
 package protobuf
 
-import proto "github.com/golang/protobuf/proto"
+import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 
@@ -62,49 +62,17 @@ func (x *RequestType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-type Trail struct {
-	AppName          *string      `protobuf:"bytes,1,opt,name=app_name" json:"app_name,omitempty"`
-	PutType          *RequestType `protobuf:"varint,2,opt,name=put_type,enum=protobuf.RequestType" json:"put_type,omitempty"`
-	Time             *int64       `protobuf:"varint,3,opt,name=time" json:"time,omitempty"`
-	XXX_unrecognized []byte       `json:"-"`
-}
-
-func (m *Trail) Reset()         { *m = Trail{} }
-func (m *Trail) String() string { return proto.CompactTextString(m) }
-func (*Trail) ProtoMessage()    {}
-
-func (m *Trail) GetAppName() string {
-	if m != nil && m.AppName != nil {
-		return *m.AppName
-	}
-	return ""
-}
-
-func (m *Trail) GetPutType() RequestType {
-	if m != nil && m.PutType != nil {
-		return *m.PutType
-	}
-	return RequestType_REQ
-}
-
-func (m *Trail) GetTime() int64 {
-	if m != nil && m.Time != nil {
-		return *m.Time
-	}
-	return 0
-}
-
 type NatsContext struct {
-	Trail            []*Trail `protobuf:"bytes,1,rep,name=trail" json:"trail,omitempty"`
-	TraceId          *string  `protobuf:"bytes,2,opt,name=trace_id" json:"trace_id,omitempty"`
-	XXX_unrecognized []byte   `json:"-"`
+	Trail            []*NatsContext_Trail `protobuf:"bytes,1,rep,name=trail" json:"trail,omitempty"`
+	TraceId          *string              `protobuf:"bytes,2,opt,name=trace_id" json:"trace_id,omitempty"`
+	XXX_unrecognized []byte               `json:"-"`
 }
 
 func (m *NatsContext) Reset()         { *m = NatsContext{} }
 func (m *NatsContext) String() string { return proto.CompactTextString(m) }
 func (*NatsContext) ProtoMessage()    {}
 
-func (m *NatsContext) GetTrail() []*Trail {
+func (m *NatsContext) GetTrail() []*NatsContext_Trail {
 	if m != nil {
 		return m.Trail
 	}
@@ -118,73 +86,43 @@ func (m *NatsContext) GetTraceId() string {
 	return ""
 }
 
-type TestMessage struct {
-	Context          *NatsContext `protobuf:"bytes,1,opt,name=context" json:"context,omitempty"`
-	Data             *string      `protobuf:"bytes,2,opt,name=data" json:"data,omitempty"`
+type NatsContext_Trail struct {
+	AppName          *string      `protobuf:"bytes,1,opt,name=app_name" json:"app_name,omitempty"`
+	PutType          *RequestType `protobuf:"varint,2,opt,name=put_type,enum=protobuf.RequestType" json:"put_type,omitempty"`
+	Time             *int64       `protobuf:"varint,3,opt,name=time" json:"time,omitempty"`
 	XXX_unrecognized []byte       `json:"-"`
 }
 
-func (m *TestMessage) Reset()         { *m = TestMessage{} }
-func (m *TestMessage) String() string { return proto.CompactTextString(m) }
-func (*TestMessage) ProtoMessage()    {}
+func (m *NatsContext_Trail) Reset()         { *m = NatsContext_Trail{} }
+func (m *NatsContext_Trail) String() string { return proto.CompactTextString(m) }
+func (*NatsContext_Trail) ProtoMessage()    {}
 
-func (m *TestMessage) GetContext() *NatsContext {
-	if m != nil {
-		return m.Context
-	}
-	return nil
-}
-
-func (m *TestMessage) GetData() string {
-	if m != nil && m.Data != nil {
-		return *m.Data
+func (m *NatsContext_Trail) GetAppName() string {
+	if m != nil && m.AppName != nil {
+		return *m.AppName
 	}
 	return ""
 }
 
+func (m *NatsContext_Trail) GetPutType() RequestType {
+	if m != nil && m.PutType != nil {
+		return *m.PutType
+	}
+	return RequestType_REQ
+}
+
+func (m *NatsContext_Trail) GetTime() int64 {
+	if m != nil && m.Time != nil {
+		return *m.Time
+	}
+	return 0
+}
+
 func init() {
-	proto.RegisterType((*Trail)(nil), "protobuf.Trail")
 	proto.RegisterType((*NatsContext)(nil), "protobuf.NatsContext")
-	proto.RegisterType((*TestMessage)(nil), "protobuf.TestMessage")
+	proto.RegisterType((*NatsContext_Trail)(nil), "protobuf.NatsContext.Trail")
 	proto.RegisterEnum("protobuf.RequestType", RequestType_name, RequestType_value)
 }
-func (m *Trail) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *Trail) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.AppName != nil {
-		data[i] = 0xa
-		i++
-		i = encodeVarintNats(data, i, uint64(len(*m.AppName)))
-		i += copy(data[i:], *m.AppName)
-	}
-	if m.PutType != nil {
-		data[i] = 0x10
-		i++
-		i = encodeVarintNats(data, i, uint64(*m.PutType))
-	}
-	if m.Time != nil {
-		data[i] = 0x18
-		i++
-		i = encodeVarintNats(data, i, uint64(*m.Time))
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(data[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
 func (m *NatsContext) Marshal() (data []byte, err error) {
 	size := m.Size()
 	data = make([]byte, size)
@@ -224,7 +162,7 @@ func (m *NatsContext) MarshalTo(data []byte) (int, error) {
 	return i, nil
 }
 
-func (m *TestMessage) Marshal() (data []byte, err error) {
+func (m *NatsContext_Trail) Marshal() (data []byte, err error) {
 	size := m.Size()
 	data = make([]byte, size)
 	n, err := m.MarshalTo(data)
@@ -234,26 +172,26 @@ func (m *TestMessage) Marshal() (data []byte, err error) {
 	return data[:n], nil
 }
 
-func (m *TestMessage) MarshalTo(data []byte) (int, error) {
+func (m *NatsContext_Trail) MarshalTo(data []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Context != nil {
+	if m.AppName != nil {
 		data[i] = 0xa
 		i++
-		i = encodeVarintNats(data, i, uint64(m.Context.Size()))
-		n1, err := m.Context.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
+		i = encodeVarintNats(data, i, uint64(len(*m.AppName)))
+		i += copy(data[i:], *m.AppName)
 	}
-	if m.Data != nil {
-		data[i] = 0x12
+	if m.PutType != nil {
+		data[i] = 0x10
 		i++
-		i = encodeVarintNats(data, i, uint64(len(*m.Data)))
-		i += copy(data[i:], *m.Data)
+		i = encodeVarintNats(data, i, uint64(*m.PutType))
+	}
+	if m.Time != nil {
+		data[i] = 0x18
+		i++
+		i = encodeVarintNats(data, i, uint64(*m.Time))
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(data[i:], m.XXX_unrecognized)
@@ -288,25 +226,6 @@ func encodeVarintNats(data []byte, offset int, v uint64) int {
 	data[offset] = uint8(v)
 	return offset + 1
 }
-func (m *Trail) Size() (n int) {
-	var l int
-	_ = l
-	if m.AppName != nil {
-		l = len(*m.AppName)
-		n += 1 + l + sovNats(uint64(l))
-	}
-	if m.PutType != nil {
-		n += 1 + sovNats(uint64(*m.PutType))
-	}
-	if m.Time != nil {
-		n += 1 + sovNats(uint64(*m.Time))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
 func (m *NatsContext) Size() (n int) {
 	var l int
 	_ = l
@@ -326,16 +245,18 @@ func (m *NatsContext) Size() (n int) {
 	return n
 }
 
-func (m *TestMessage) Size() (n int) {
+func (m *NatsContext_Trail) Size() (n int) {
 	var l int
 	_ = l
-	if m.Context != nil {
-		l = m.Context.Size()
+	if m.AppName != nil {
+		l = len(*m.AppName)
 		n += 1 + l + sovNats(uint64(l))
 	}
-	if m.Data != nil {
-		l = len(*m.Data)
-		n += 1 + l + sovNats(uint64(l))
+	if m.PutType != nil {
+		n += 1 + sovNats(uint64(*m.PutType))
+	}
+	if m.Time != nil {
+		n += 1 + sovNats(uint64(*m.Time))
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -356,7 +277,119 @@ func sovNats(x uint64) (n int) {
 func sozNats(x uint64) (n int) {
 	return sovNats(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *Trail) Unmarshal(data []byte) error {
+func (m *NatsContext) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowNats
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: NatsContext: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: NatsContext: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Trail", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowNats
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthNats
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Trail = append(m.Trail, &NatsContext_Trail{})
+			if err := m.Trail[len(m.Trail)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TraceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowNats
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthNats
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			s := string(data[iNdEx:postIndex])
+			m.TraceId = &s
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipNats(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthNats
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, data[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *NatsContext_Trail) Unmarshal(data []byte) error {
 	l := len(data)
 	iNdEx := 0
 	for iNdEx < l {
@@ -455,232 +488,6 @@ func (m *Trail) Unmarshal(data []byte) error {
 				}
 			}
 			m.Time = &v
-		default:
-			iNdEx = preIndex
-			skippy, err := skipNats(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthNats
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, data[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *NatsContext) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowNats
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: NatsContext: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: NatsContext: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Trail", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowNats
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthNats
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Trail = append(m.Trail, &Trail{})
-			if err := m.Trail[len(m.Trail)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TraceId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowNats
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthNats
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.TraceId = &s
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipNats(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthNats
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, data[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *TestMessage) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowNats
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: TestMessage: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: TestMessage: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Context", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowNats
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthNats
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Context == nil {
-				m.Context = &NatsContext{}
-			}
-			if err := m.Context.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowNats
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthNats
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			s := string(data[iNdEx:postIndex])
-			m.Data = &s
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNats(data[iNdEx:])
