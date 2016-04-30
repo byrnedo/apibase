@@ -48,9 +48,11 @@ type PayloadWithContext interface {
 func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
 	var ctx *NatsContext
 
-	if ctx = data.GetContext(); ctx == nil {
+	if data.GetContext() {
 		data.SetContext(&NatsContext{})
 	}
+
+	ctx = data.GetContext()
 
 	if len(ctx.GetTraceId()) == 0 {
 		newId := uuid.NewUUID().String()
