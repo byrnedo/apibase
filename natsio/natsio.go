@@ -48,7 +48,7 @@ type PayloadWithContext interface {
 func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
 	var ctx *NatsContext
 
-	if data.GetContext() {
+	if data.GetContext() == nil {
 		data.SetContext(&NatsContext{})
 	}
 
