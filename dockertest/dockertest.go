@@ -17,7 +17,7 @@ func init() {
 	}
 }
 
-func Start(image string, portB map[gDoc.Port][]gDoc.PortBinding) (string, error) {
+func Start(image string, portB map[gDoc.Port][]gDoc.PortBinding, envs []string) (string, error) {
 
 	if err := dockCli.PullImage(gDoc.PullImageOptions{Repository: image, OutputStream: os.Stdout}, gDoc.AuthConfiguration{}); err != nil {
 
@@ -29,6 +29,7 @@ func Start(image string, portB map[gDoc.Port][]gDoc.PortBinding) (string, error)
 			Labels: map[string]string{
 				"ApiBaseTestFlag": image,
 			},
+			Env: envs,
 			Image: image,
 		},
 		HostConfig: &gDoc.HostConfig{

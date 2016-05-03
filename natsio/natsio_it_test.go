@@ -45,7 +45,7 @@ func setup() {
 				HostIP:   "127.0.0.1",
 				HostPort: NatsPort,
 			}},
-		}); err != nil {
+		}, nil); err != nil {
 			panic("Failed to start nats test container:" + err.Error())
 		}
 	}

@@ -1,4 +1,4 @@
-package postgres
+package mysql
 
 import (
 	"fmt"
@@ -10,14 +10,15 @@ import (
 )
 
 const (
-	PostgresImage    = "postgres:9.4"
-	PostgresPort     = "5532"
-	PostgresPassword = "mysecretpassword"
+	MysqlImage = "mysql:5.7"
+	MysqlDatabase = "test"
+	MysqlPort = "4306"
+	MysqlPassword = "mysecretpassword"
 )
 
 var (
 	dckrCli  *gDoc.Client
-	psqlCntr *gDoc.Container
+	mysqlCtnr *gDoc.Container
 )
 
 func TestDefaultConfig(t *testing.T) {
@@ -40,7 +41,6 @@ func TestDefaultConfig(t *testing.T) {
 }
 
 func TestConnectAndQuery(t *testing.T) {
-	var err error
 
 	fmt.Println("Setting up container")
 	setupContainer(t)
@@ -52,32 +52,31 @@ func TestConnectAndQuery(t *testing.T) {
 		}
 
 	}()
+
 	Init(func(c *Config) {
-		c.ConnectString = fmt.Sprintf("dbname=postgres user=postgres host=127.0.0.1 port=%s sslmode=disable connect_timeout=5", PostgresPort)
+		c.ConnectString = fmt.Sprintf("root:%s@tcp(127.0.0.1:%s)/%s?timeout=90s", MysqlPassword, MysqlPort, MysqlDatabase)
+		t.Log(c.ConnectString)
 	})
 
 	if DB == nil {
 		t.Error("DB was nil, not good.")
 	}
 
-	_, err = DB.SQL("select $1", 1).Exec()
-	if err != nil {
-		t.Error("Failed to do select: ", err.Error())
-	}
+	_ = DB.MustExec("select 1")
 
 }
 
 func setupContainer(t *testing.T) {
 
-	if id, err := dockertest.Running(PostgresImage); err != nil || len(id) < 1 {
+	if id, err := dockertest.Running(MysqlImage); err != nil || len(id) < 1 {
 		t.Log("Starting container")
-		if _, err := dockertest.Start(PostgresImage, map[gDoc.Port][]gDoc.PortBinding{
-			"5432/tcp": []gDoc.PortBinding{gDoc.PortBinding{
+		if _, err := dockertest.Start(MysqlImage, map[gDoc.Port][]gDoc.PortBinding{
+			"3306/tcp": []gDoc.PortBinding{gDoc.PortBinding{
 				HostIP:   "127.0.0.1",
-				HostPort: PostgresPort,
+				HostPort: MysqlPort,
 			}},
-		}, nil); err != nil {
-			panic("Error starting postgres:" + err.Error())
+		}, []string{"MYSQL_ROOT_PASSWORD="+MysqlPassword, "MYSQL_DATABASE=" + MysqlDatabase}); err != nil {
+			panic("Error starting mysql:" + err.Error())
 		}
 
 	}
