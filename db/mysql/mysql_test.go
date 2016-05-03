@@ -6,7 +6,6 @@ import (
 	gDoc "github.com/fsouza/go-dockerclient"
 	"reflect"
 	"testing"
-	"time"
 )
 
 const (
@@ -30,9 +29,6 @@ func TestDefaultConfig(t *testing.T) {
 		ConnectString:       "",
 		MaxIdleCons:         4,
 		MaxOpenCons:         16,
-		EnableQueryInterp:   true,
-		LogQueriesThreshold: 2 * time.Second,
-		ProdMode:            true,
 	}
 
 	if !reflect.DeepEqual(conf, &expectedConf) {
