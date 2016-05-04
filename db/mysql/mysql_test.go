@@ -9,14 +9,14 @@ import (
 )
 
 const (
-	MysqlImage = "mysql:5.7"
+	MysqlImage    = "mysql:5.7"
 	MysqlDatabase = "test"
-	MysqlPort = "4306"
+	MysqlPort     = "4306"
 	MysqlPassword = "mysecretpassword"
 )
 
 var (
-	dckrCli  *gDoc.Client
+	dckrCli   *gDoc.Client
 	mysqlCtnr *gDoc.Container
 )
 
@@ -26,9 +26,9 @@ func TestDefaultConfig(t *testing.T) {
 	})
 
 	expectedConf := Config{
-		ConnectString:       "",
-		MaxIdleCons:         4,
-		MaxOpenCons:         16,
+		ConnectString: "",
+		MaxIdleCons:   4,
+		MaxOpenCons:   16,
 	}
 
 	if !reflect.DeepEqual(conf, &expectedConf) {
@@ -71,7 +71,7 @@ func setupContainer(t *testing.T) {
 				HostIP:   "127.0.0.1",
 				HostPort: MysqlPort,
 			}},
-		}, []string{"MYSQL_ROOT_PASSWORD="+MysqlPassword, "MYSQL_DATABASE=" + MysqlDatabase}); err != nil {
+		}, []string{"MYSQL_ROOT_PASSWORD=" + MysqlPassword, "MYSQL_DATABASE=" + MysqlDatabase}); err != nil {
 			panic("Error starting mysql:" + err.Error())
 		}
 

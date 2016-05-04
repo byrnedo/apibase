@@ -15,8 +15,8 @@ package defaultnats
 
 import (
 	"github.com/byrnedo/apibase/config"
-	_ "github.com/byrnedo/apibase/logger/defaultlogger"
 	. "github.com/byrnedo/apibase/logger"
+	_ "github.com/byrnedo/apibase/logger/defaultlogger"
 	"github.com/byrnedo/apibase/natsio"
 	"github.com/byrnedo/typesafe-config/parse"
 	"time"

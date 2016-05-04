@@ -18,7 +18,7 @@ var (
 
 func init() {
 	fs := flag.NewFlagSet("config", flag.ContinueOnError)
-	fs.Usage = func(){
+	fs.Usage = func() {
 
 	}
 	fs.StringVar(&configPath, "conf", "conf/app.conf", "Configuration file path")

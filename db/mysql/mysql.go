@@ -11,15 +11,15 @@ var DB *sqlx.DB
 
 // ConnectString should look something like "dbname=dat_test user=dat password=!test host=localhost sslmode=disable"
 type Config struct {
-	ConnectString       string
-	MaxIdleCons         int
-	MaxOpenCons         int
+	ConnectString string
+	MaxIdleCons   int
+	MaxOpenCons   int
 }
 
 func newDefaultConfig(confFuncs ...func(*Config)) *Config {
 	config := Config{
-		MaxIdleCons:         4,
-		MaxOpenCons:         16,
+		MaxIdleCons: 4,
+		MaxOpenCons: 16,
 	}
 	for _, f := range confFuncs {
 		f(&config)

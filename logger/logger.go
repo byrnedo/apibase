@@ -27,11 +27,11 @@ const (
 	ErrorLevel LogLevel = 3
 )
 
-func init(){
+func init() {
 
 	Trace = log.New(ioutil.Discard,
 		"TRACE: ",
-		logFormat )
+		logFormat)
 
 	Info = log.New(os.Stdout,
 		"INFO: ",

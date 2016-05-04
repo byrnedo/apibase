@@ -29,7 +29,7 @@ func Start(image string, portB map[gDoc.Port][]gDoc.PortBinding, envs []string) 
 			Labels: map[string]string{
 				"ApiBaseTestFlag": image,
 			},
-			Env: envs,
+			Env:   envs,
 			Image: image,
 		},
 		HostConfig: &gDoc.HostConfig{
