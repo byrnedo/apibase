@@ -1,23 +1,15 @@
 package mysql
 
 import (
-	"fmt"
-	"github.com/byrnedo/apibase/dockertest"
-	gDoc "github.com/fsouza/go-dockerclient"
 	"reflect"
 	"testing"
-)
-
-const (
-	MysqlImage    = "mysql:5.7"
-	MysqlDatabase = "test"
-	MysqlPort     = "4306"
-	MysqlPassword = "mysecretpassword"
+	"github.com/byrnedo/prefab"
+	"time"
 )
 
 var (
-	dckrCli   *gDoc.Client
-	mysqlCtnr *gDoc.Container
+	mysqlCtnr string
+	mysqlUrl string
 )
 
 func TestDefaultConfig(t *testing.T) {
@@ -38,20 +30,19 @@ func TestDefaultConfig(t *testing.T) {
 
 func TestConnectAndQuery(t *testing.T) {
 
-	fmt.Println("Setting up container")
-	setupContainer(t)
-	fmt.Println("Container set up.")
+	mysqlCtnr, mysqlUrl = prefab.StartMysqlContainer()
 
 	defer func() {
 		if r := recover(); r != nil {
 			t.Error("Should not have panicked: ", r)
 		}
-
 	}()
 
+	prefab.WaitForMysql(mysqlUrl, 30 *time.Second)
+
 	Init(func(c *Config) {
-		c.ConnectString = fmt.Sprintf("root:%s@tcp(127.0.0.1:%s)/%s?timeout=90s", MysqlPassword, MysqlPort, MysqlDatabase)
-		t.Log(c.ConnectString)
+		c.ConnectString = mysqlUrl
+		t.Log("["+c.ConnectString+"]")
 	})
 
 	if DB == nil {
@@ -60,20 +51,7 @@ func TestConnectAndQuery(t *testing.T) {
 
 	_ = DB.MustExec("select 1")
 
+	prefab.Remove(mysqlCtnr)
+
 }
 
-func setupContainer(t *testing.T) {
-
-	if id, err := dockertest.Running(MysqlImage); err != nil || len(id) < 1 {
-		t.Log("Starting container")
-		if _, err := dockertest.Start(MysqlImage, map[gDoc.Port][]gDoc.PortBinding{
-			"3306/tcp": []gDoc.PortBinding{gDoc.PortBinding{
-				HostIP:   "127.0.0.1",
-				HostPort: MysqlPort,
-			}},
-		}, []string{"MYSQL_ROOT_PASSWORD=" + MysqlPassword, "MYSQL_DATABASE=" + MysqlDatabase}); err != nil {
-			panic("Error starting mysql:" + err.Error())
-		}
-
-	}
-}

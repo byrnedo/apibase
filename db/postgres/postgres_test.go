@@ -1,23 +1,16 @@
 package postgres
 
 import (
-	"fmt"
-	"github.com/byrnedo/apibase/dockertest"
-	gDoc "github.com/fsouza/go-dockerclient"
 	"reflect"
 	"testing"
 	"time"
+	"github.com/byrnedo/prefab"
 )
 
-const (
-	PostgresImage    = "postgres:9.4"
-	PostgresPort     = "5532"
-	PostgresPassword = "mysecretpassword"
-)
 
 var (
-	dckrCli  *gDoc.Client
-	psqlCntr *gDoc.Container
+	psqlCntr string
+	psqlUrl string
 )
 
 func TestDefaultConfig(t *testing.T) {
@@ -42,18 +35,17 @@ func TestDefaultConfig(t *testing.T) {
 func TestConnectAndQuery(t *testing.T) {
 	var err error
 
-	fmt.Println("Setting up container")
-	setupContainer(t)
-	fmt.Println("Container set up.")
+	psqlCntr, psqlUrl := prefab.StartPostgresContainer()
 
 	defer func() {
 		if r := recover(); r != nil {
 			t.Error("Should not have panicked: ", r)
 		}
-
 	}()
+
+	prefab.WaitForPostgres(psqlUrl, 10*time.Second)
 	Init(func(c *Config) {
-		c.ConnectString = fmt.Sprintf("dbname=postgres user=postgres host=127.0.0.1 port=%s sslmode=disable connect_timeout=5", PostgresPort)
+		c.ConnectString = psqlUrl + "?sslmode=disable"
 	})
 
 	if DB == nil {
@@ -65,20 +57,7 @@ func TestConnectAndQuery(t *testing.T) {
 		t.Error("Failed to do select: ", err.Error())
 	}
 
+	prefab.Remove(psqlCntr)
+
 }
 
-func setupContainer(t *testing.T) {
-
-	if id, err := dockertest.Running(PostgresImage); err != nil || len(id) < 1 {
-		t.Log("Starting container")
-		if _, err := dockertest.Start(PostgresImage, map[gDoc.Port][]gDoc.PortBinding{
-			"5432/tcp": []gDoc.PortBinding{gDoc.PortBinding{
-				HostIP:   "127.0.0.1",
-				HostPort: PostgresPort,
-			}},
-		}, nil); err != nil {
-			panic("Error starting postgres:" + err.Error())
-		}
-
-	}
-}

@@ -1,9 +1,8 @@
 package natsio
 
 import (
-	"github.com/byrnedo/apibase/dockertest"
+	"github.com/byrnedo/prefab"
 	. "github.com/byrnedo/apibase/natsio/protobuf"
-	gDoc "github.com/fsouza/go-dockerclient"
 	"github.com/nats-io/nats"
 	"github.com/nats-io/nats/encoders/protobuf"
 	"os"
@@ -12,13 +11,10 @@ import (
 	"time"
 )
 
-const (
-	NatsImage = "nats:latest"
-	NatsPort  = "5222"
-)
 
 var (
 	natsContainer string
+	natsUrl string
 )
 
 type Wrap struct {
@@ -34,21 +30,9 @@ func WrapMessage(msg *TestMessage) *Wrap {
 }
 
 func setup() {
-	var (
-		err error
-	)
 	nats.RegisterEncoder(protobuf.PROTOBUF_ENCODER, &protobuf.ProtobufEncoder{})
 
-	if natsContainer, err = dockertest.Running(NatsImage); err != nil || len(natsContainer) == 0 {
-		if natsContainer, err = dockertest.Start(NatsImage, map[gDoc.Port][]gDoc.PortBinding{
-			"4222/tcp": []gDoc.PortBinding{gDoc.PortBinding{
-				HostIP:   "127.0.0.1",
-				HostPort: NatsPort,
-			}},
-		}, nil); err != nil {
-			panic("Failed to start nats test container:" + err.Error())
-		}
-	}
+	natsContainer, natsUrl = prefab.StartNatsContainer()
 
 }
 
@@ -59,6 +43,7 @@ func TestMain(m *testing.M) {
 	retCode := m.Run()
 
 	// call with result of m.Run()
+	prefab.Remove(natsContainer)
 	os.Exit(retCode)
 }
 
@@ -195,7 +180,7 @@ func TestHandleFunc(t *testing.T) {
 func setupConnection() *NatsOptions {
 
 	return NewNatsOptions(func(n *NatsOptions) error {
-		n.Url = "nats://localhost:" + NatsPort
+		n.Url = natsUrl
 		n.Name = "it_test"
 		n.Timeout = 10 * time.Second
 		return nil

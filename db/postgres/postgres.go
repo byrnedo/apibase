@@ -8,6 +8,7 @@ import (
 	"gopkg.in/mgutz/dat.v1/kvs"
 	"gopkg.in/mgutz/dat.v1/sqlx-runner"
 	"time"
+	"fmt"
 )
 
 // global database (pooling provided by SQL driver)
@@ -49,6 +50,7 @@ func Init(confFunc func(conf *Config)) {
 
 	// create a normal database connection through database/sql
 	db, err := sql.Open("postgres", conf.ConnectString)
+	fmt.Println("open")
 	if err != nil {
 		panic(err)
 	}
@@ -60,7 +62,7 @@ func Init(confFunc func(conf *Config)) {
 	}
 
 	// ensures the database can be pinged with an exponential backoff (15 min)
-	runner.MustPing(db)
+	//runner.MustPing(db)
 
 	// set to reasonable values for production
 	db.SetMaxIdleConns(conf.MaxIdleCons)
