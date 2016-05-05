@@ -1,8 +1,8 @@
 package natsio
 
 import (
-	"github.com/nats-io/nats"
-	"github.com/nats-io/nats/encoders/protobuf"
+	"github.com/apcera/nats"
+	"github.com/apcera/nats/encoders/protobuf"
 	"time"
 )
 
