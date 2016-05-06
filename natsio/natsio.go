@@ -4,7 +4,7 @@ import (
 	"errors"
 	. "github.com/byrnedo/apibase/natsio/protobuf"
 	"github.com/golang/protobuf/proto"
-	"github.com/apcera/nats"
+	"github.com/nats-io/nats"
 	"github.com/pborman/uuid"
 	"time"
 )
