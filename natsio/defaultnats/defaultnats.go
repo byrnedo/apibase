@@ -43,6 +43,7 @@ func init() {
 
 	attempts := 1
 	for attempts <= 5 {
+		attempts ++
 		Conn, err = natsOpts.Connect()
 		if err == nil {
 			break
