@@ -41,11 +41,13 @@ func init() {
 
 	var err error
 
+	Info.Print("Connecting to nats")
 	attempts := 1
 	for attempts <= 5 {
 		attempts ++
 		Conn, err = natsOpts.Connect()
 		if err == nil {
+			Warning.Println(err)
 			break
 		}
 		time.Sleep(2 * time.Second)
@@ -54,4 +56,5 @@ func init() {
 	if err != nil {
 		panic("Failed to connect to nats:" + err.Error())
 	}
+	Info.Print("Connected to nats")
 }
