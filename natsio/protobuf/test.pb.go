@@ -15,6 +15,48 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
+type Subject int32
+
+const (
+	Subject_test_tests_unknown Subject = 0
+	Subject_test_tests_get     Subject = 1
+	Subject_test_tests_replace Subject = 2
+	Subject_test_tests_delete  Subject = 3
+	Subject_test_tests_find    Subject = 4
+)
+
+var Subject_name = map[int32]string{
+	0: "test_tests_unknown",
+	1: "test_tests_get",
+	2: "test_tests_replace",
+	3: "test_tests_delete",
+	4: "test_tests_find",
+}
+var Subject_value = map[string]int32{
+	"test_tests_unknown": 0,
+	"test_tests_get":     1,
+	"test_tests_replace": 2,
+	"test_tests_delete":  3,
+	"test_tests_find":    4,
+}
+
+func (x Subject) Enum() *Subject {
+	p := new(Subject)
+	*p = x
+	return p
+}
+func (x Subject) String() string {
+	return proto.EnumName(Subject_name, int32(x))
+}
+func (x *Subject) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(Subject_value, data, "Subject")
+	if err != nil {
+		return err
+	}
+	*x = Subject(value)
+	return nil
+}
+
 type TestMessage struct {
 	Context          *NatsContext `protobuf:"bytes,1,opt,name=context" json:"context,omitempty"`
 	Data             *string      `protobuf:"bytes,2,opt,name=data" json:"data,omitempty"`
@@ -41,6 +83,7 @@ func (m *TestMessage) GetData() string {
 
 func init() {
 	proto.RegisterType((*TestMessage)(nil), "protobuf.TestMessage")
+	proto.RegisterEnum("protobuf.Subject", Subject_name, Subject_value)
 }
 func (m *TestMessage) Marshal() (data []byte, err error) {
 	size := m.Size()
