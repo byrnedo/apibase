@@ -66,7 +66,8 @@ func TestNewNatsConnect(t *testing.T) {
 		//since it wont get called until after connecting
 		//when it will then get a ping message.
 		data := "Pong"
-		natsCon.Publish(reply, testData.Context, WrapMessage(&TestMessage{
+		natsCon.Publish(reply, WrapMessage(&TestMessage{
+			Context: testData.Context,
 			Data: &data,
 		}))
 	}
@@ -79,7 +80,7 @@ func TestNewNatsConnect(t *testing.T) {
 		Context: &NatsContext{},
 		Data:    &data,
 	}
-	err = natsCon.Request("test.a", &NatsContext{}, WrapMessage(request), &response, 2*time.Second)
+	err = natsCon.Request("test.a", WrapMessage(request), &response, 2*time.Second)
 	t.Logf("Got response on nats: %+v", &response)
 
 	if err != nil {

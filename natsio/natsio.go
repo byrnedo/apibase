@@ -68,8 +68,7 @@ func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
 // Adds a context if it doesn't exist. Otherwise appends which app and time
 // that this message is being sent at.
 // Adds a traceID if not already there
-func (n *Nats) Publish(subject string, currentContext *NatsContext, data PayloadWithContext) error {
-	data.SetContext(currentContext)
+func (n *Nats) Publish(subject string, data PayloadWithContext) error {
 	n.updateContext(data, RequestType_PUB)
 	return n.EncCon.Publish(subject, data)
 }
@@ -78,8 +77,7 @@ func (n *Nats) Publish(subject string, currentContext *NatsContext, data Payload
 // Adds a context if it doesn't exist. Otherwise appends which app and time
 // that this message is being sent at.
 // Adds a traceID if not already there
-func (n *Nats) PublishRequest(subject string, reply string, currentContext *NatsContext, data PayloadWithContext) error {
-	data.SetContext(currentContext)
+func (n *Nats) PublishRequest(subject string, reply string, data PayloadWithContext) error {
 	n.updateContext(data, RequestType_PUBREQ)
 	return n.EncCon.PublishRequest(subject, reply, data)
 }
@@ -88,8 +86,7 @@ func (n *Nats) PublishRequest(subject string, reply string, currentContext *Nats
 // Adds a context if it doesn't exist. Otherwise appends which app and time
 // that this message is being sent at.
 // Adds a traceID if not already there
-func (n *Nats) Request(subject string, currentContext *NatsContext, data PayloadWithContext, responsePtr interface{}, timeout time.Duration) error {
-	data.SetContext(currentContext)
+func (n *Nats) Request(subject string, data PayloadWithContext, responsePtr interface{}, timeout time.Duration) error {
 	n.updateContext(data, RequestType_REQ)
 	return n.EncCon.Request(subject, data, responsePtr, timeout)
 }
