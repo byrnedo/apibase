@@ -19,6 +19,8 @@ func init() {
 		c2, err := mysqlReal.ParseDSN(c.ConnectString)
 		if err == nil {
 			Info.Printf("Attempting to connect to %s@%s\n", c2.User, c2.Addr)
+		} else {
+			Error.Println("Error parsing DSN:", c.ConnectString)
 		}
 	})
 }
