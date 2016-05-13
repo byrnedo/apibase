@@ -11,6 +11,7 @@ var DB *sqlx.DB
 
 // ConnectString should look something like "dbname=dat_test user=dat password=!test host=localhost sslmode=disable"
 type Config struct {
+	MigrationsPath string
 	ConnectString string
 	MaxIdleCons   int
 	MaxOpenCons   int

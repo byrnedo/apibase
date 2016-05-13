@@ -13,9 +13,11 @@ import (
 
 func init() {
 
+	migrationsPath := ""
 	mysql.Init(func(c *mysql.Config) {
 		parse.Populate(c, config.Conf, "mysql")
 
+		migrationsPath = c.MigrationsPath
 		c2, err := mysqlReal.ParseDSN(c.ConnectString)
 		if err == nil {
 			Info.Printf("Attempting to connect to %s@%s\n", c2.User, c2.Addr)
@@ -23,4 +25,8 @@ func init() {
 			Error.Println("Error parsing DSN:", c.ConnectString)
 		}
 	})
+
+	if migrationsPath != "" {
+		mysql.Migrate(migrationsPath)
+	}
 }
