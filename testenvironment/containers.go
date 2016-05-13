@@ -151,6 +151,7 @@ func (this *TestEnvironment) Cleanup() {
 			prefab.Remove(id)
 			wg.Done()
 		}()
+		time.Sleep(50 * time.Millisecond)
 	}
 	wg.Wait()
 }
