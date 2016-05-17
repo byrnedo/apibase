@@ -65,6 +65,26 @@ func (this *TestEnvironment) WithMysql() *TestEnvironment {
 	return this
 }
 
+// Queue a mongo tmpfs container
+func (this *TestEnvironment) WithMongoTmpfs() *TestEnvironment {
+	this.funcList = append(this.funcList, startAndWaitFuncs{
+		name: "mongo",
+		startFunc: prefab.StartMongoTmpfsContainer,
+		waitFunc: prefab.WaitForMongo,
+	})
+	return this
+}
+
+// Queue a mysql container on tmpfs
+func (this *TestEnvironment) WithMysqlTmpfs() *TestEnvironment {
+	this.funcList = append(this.funcList, startAndWaitFuncs{
+		name: "mysql",
+		startFunc: prefab.StartMysqlTmpfsContainer,
+		waitFunc: prefab.WaitForMysql,
+	})
+	return this
+}
+
 // Queue a nats container
 func (this *TestEnvironment) WithNats() *TestEnvironment {
 	this.funcList = append(this.funcList, startAndWaitFuncs{
