@@ -16,8 +16,8 @@ type Nats struct {
 }
 
 // Subscribe and record subscription to routes
-func (n *Nats) Subscribe(route string, handler nats.MsgHandler) error {
-	subsc, err := n.EncCon.Conn.Subscribe(route, handler)
+func (n *Nats) Subscribe(route string, handler nats.Handler) error {
+	subsc, err := n.EncCon.Subscribe(route, handler)
 	if err != nil {
 		return errors.New("Failed to make subcriptions for " + route + ": " + err.Error())
 	}
@@ -26,8 +26,8 @@ func (n *Nats) Subscribe(route string, handler nats.MsgHandler) error {
 }
 
 // Subscribe to queue group and record subscription to routes
-func (n *Nats) QueueSubscribe(route string, group string, handler nats.MsgHandler) error {
-	subsc, err := n.EncCon.Conn.QueueSubscribe(route, group, handler)
+func (n *Nats) QueueSubscribe(route string, group string, handler nats.Handler) error {
+	subsc, err := n.EncCon.QueueSubscribe(route, group, handler)
 	if err != nil {
 		return errors.New("Failed to make subcriptions for " + route + ": " + err.Error())
 	}

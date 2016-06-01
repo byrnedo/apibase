@@ -60,17 +60,13 @@ func TestNewNatsConnect(t *testing.T) {
 		return
 	}
 
-	var handler = func(msg *nats.Msg) {
-		testData := &TestMessage{}
-		if err := testData.Unmarshal(msg.Data); err != nil {
-			t.Fatal(err)
-		}
+	var handler = func(subj string, reply string, testData *TestMessage) {
 		t.Logf("Got message on nats: %+v", testData)
 		//EncCon is nil at this point but that's ok
 		//since it wont get called until after connecting
 		//when it will then get a ping message.
 		data := "Pong"
-		natsCon.Publish(msg.Reply, WrapMessage(&TestMessage{
+		natsCon.Publish(reply, WrapMessage(&TestMessage{
 			Context: testData.Context,
 			Data: &data,
 		}))
