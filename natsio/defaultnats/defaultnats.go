@@ -20,6 +20,7 @@ import (
 	"github.com/byrnedo/apibase/natsio"
 	"github.com/byrnedo/typesafe-config/parse"
 	"time"
+	"github.com/nats-io/nats"
 )
 
 var Conn *natsio.Nats
@@ -38,6 +39,18 @@ func init() {
 
 	Info.Println("Nats encoding:", encoding)
 	natsOpts.SetEncoding(encoding)
+
+	natsOpts.Options.AsyncErrorCB = func(c *nats.Conn, s *nats.Subscription, err error) {
+		Error.Println("Got nats async error:", err)
+	}
+
+	natsOpts.Options.DisconnectedCB = func(c *nats.Conn) {
+		Warning.Println("Nats disconnected")
+	}
+
+	natsOpts.Options.ReconnectedCB = func(c *nats.Conn) {
+		Info.Println("Nats reconnected")
+	}
 
 	var err error
 
