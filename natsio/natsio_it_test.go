@@ -72,7 +72,16 @@ func TestNewNatsConnect(t *testing.T) {
 		}))
 	}
 
+	var simpleHandler = func(m *nats.Msg) {
+
+		testData := &TestMessage{}
+		testData.Unmarshal(m.Data)
+		handler(m.Subject, m.Reply, testData)
+	}
+
 	natsCon.Subscribe("test.a", handler)
+
+	natsCon.Subscribe("test.b.>", simpleHandler)
 
 	data := "Ping"
 	response := TestMessage{}
@@ -95,6 +104,14 @@ func TestNewNatsConnect(t *testing.T) {
 
 	if *response.Context.TraceId != *request.Context.TraceId {
 		t.Errorf("Request and response trace id differs\nExpected %s\nReceived %s\n", *request.Context.TraceId, *response.Context.TraceId)
+	}
+
+	err = natsCon.Request("test.b.some", WrapMessage(request), &response, 2*time.Second)
+	t.Logf("Got response from simple handler on nats: %+v", &response)
+
+	if err != nil {
+		t.Error("Failed to get response via simple subscribe:" + err.Error())
+		return
 	}
 
 	natsCon.UnsubscribeAll()
