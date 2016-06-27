@@ -15,7 +15,7 @@ var (
 
 	baseOptions *LogOptions
 
-	logFormat int = log.Ldate | log.Ltime | log.LUTC | log.Llongfile
+	logFormat int = log.Ldate | log.Ltime | log.LUTC | log.Lshortfile
 )
 
 type LogLevel int
