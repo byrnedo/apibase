@@ -9,12 +9,21 @@ import (
 	"time"
 )
 
+type statusLoggingResponseWriter struct {
+	status int
+	http.ResponseWriter
+}
+
+func (w *statusLoggingResponseWriter) WriteHeader(code int) {
+	w.status = code
+	w.ResponseWriter.WriteHeader(code)
+}
+
 func LogTime(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
-
-		next.ServeHTTP(w, r)
-
+		wrapW := statusLoggingResponseWriter{-1, w}
+		next.ServeHTTP(&wrapW, r)
 		duration := time.Since(startTime)
 
 		var ips string
@@ -23,7 +32,7 @@ func LogTime(next http.Handler) http.Handler {
 		} else {
 			ips = r.RemoteAddr
 		}
-		Info.Printf("%s -> [%s] %q %v \n", ips, r.Method, r.URL.Path, duration)
+		Info.Printf("%s -> [%s] %d %q %v\n", ips, r.Method, wrapW.status, r.URL.Path, duration)
 	})
 }
 
