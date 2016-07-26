@@ -1,0 +1,41 @@
+package: github.com/byrnedo/apibase
+import:
+- package: github.com/DavidHuie/gomigrate
+- package: github.com/byrnedo/mapcast
+- package: github.com/byrnedo/prefab
+  version: ^0.1.0
+- package: github.com/byrnedo/svccommon
+  subpackages:
+  - msgspec/web
+- package: github.com/byrnedo/typesafe-config
+  subpackages:
+  - parse
+- package: github.com/go-sql-driver/mysql
+  version: ^1.2.0
+- package: github.com/gogo/protobuf
+  version: ^0.2.0
+  subpackages:
+  - proto
+- package: github.com/golang/protobuf
+  subpackages:
+  - proto
+- package: github.com/jmoiron/sqlx
+- package: github.com/julienschmidt/httprouter
+  version: ^1.1.0
+- package: github.com/lib/pq
+- package: github.com/mattn/go-sqlite3
+  version: ^1.1.0
+- package: github.com/nats-io/nats
+  version: ^1.2.0
+  subpackages:
+  - encoders/protobuf
+- package: github.com/pborman/uuid
+  version: ^1.0.0
+- package: gopkg.in/mgo.v2
+  subpackages:
+  - bson
+- package: gopkg.in/mgutz/dat.v1
+  version: ^1.1.9
+  subpackages:
+  - kvs
+  - sqlx-runner

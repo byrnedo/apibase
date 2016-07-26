@@ -1,0 +1,129 @@
+hash: fd66d7e3180955657151cba8da8f22cfe7da78e1a71ce9ae548feed290ca59b6
+updated: 2016-07-26T09:42:18.597555233+02:00
+imports:
+- name: github.com/byrnedo/mapcast
+  version: 76b07c9b4c2ce7ee42b418be65317345d0d68d5b
+- name: github.com/byrnedo/prefab
+  version: 362a734da4809f257b2d2d51412ca977b4ea9372
+- name: github.com/byrnedo/svccommon
+  version: 43195f2fd5d0c9d74a1e832f352c09b28fb103de
+  subpackages:
+  - msgspec/web
+- name: github.com/byrnedo/typesafe-config
+  version: 443f6f88872bc6cd5a16544e3e850e80b1424245
+  subpackages:
+  - parse
+- name: github.com/cenkalti/backoff
+  version: cdf48bbc1eb78d1349cbda326a4a037f7ba565c6
+- name: github.com/DavidHuie/gomigrate
+  version: 1b90a570dc6b7aaaefa233eacf304be363a89603
+- name: github.com/docker/docker
+  version: 4144e11d3205ef45bedc3f7bf04da5d6a24ec342
+  subpackages:
+  - opts
+  - pkg/archive
+  - pkg/fileutils
+  - pkg/homedir
+  - pkg/stdcopy
+  - pkg/idtools
+  - pkg/ioutils
+  - pkg/pools
+  - pkg/promise
+  - pkg/system
+  - pkg/longpath
+- name: github.com/docker/engine-api
+  version: a52656d77f09d394104c1639824eada038bfdb89
+  subpackages:
+  - types/filters
+  - types/versions
+- name: github.com/docker/go-units
+  version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
+- name: github.com/fsouza/go-dockerclient
+  version: d433254bb83b41d7072ce470e312ea3cee257882
+- name: github.com/garyburd/redigo
+  version: b8dc90050f24c1a73a52f107f3f575be67b21b7c
+  subpackages:
+  - redis
+  - internal
+- name: github.com/go-sql-driver/mysql
+  version: a732e14c62dde3285440047bba97581bc472ae18
+- name: github.com/gogo/protobuf
+  version: 4168943e65a2802828518e95310aeeed6d84c4e5
+  subpackages:
+  - proto
+- name: github.com/golang/protobuf
+  version: 874264fbbb43f4d91e999fecb4b40143ed611400
+  subpackages:
+  - proto
+- name: github.com/hashicorp/go-cleanhttp
+  version: ad28ea4487f05916463e2423a55166280e8254b5
+- name: github.com/jmoiron/sqlx
+  version: bdae0c3219c3bdb92f3d7c70825018712787c933
+  subpackages:
+  - reflectx
+- name: github.com/julienschmidt/httprouter
+  version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
+- name: github.com/lib/pq
+  version: 4dd446efc17690bc53e154025146f73203b18309
+  subpackages:
+  - oid
+- name: github.com/mattn/go-colorable
+  version: 9056b7a9f2d1f2d96498d6d146acd1f9d5ed3d59
+- name: github.com/mattn/go-isatty
+  version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+- name: github.com/mattn/go-sqlite3
+  version: 3b3f1d01b2696af5501697c35629048c227586ab
+- name: github.com/mgutz/ansi
+  version: c286dcecd19ff979eeb73ea444e479b903f2cfcb
+- name: github.com/mgutz/logxi
+  version: 7d364cab682d1b7b9063a3293c9e8c3087194940
+  subpackages:
+  - v1
+- name: github.com/mgutz/str
+  version: 968bf66e3da857419e4f6e71b2d5c9ae95682dc4
+- name: github.com/nats-io/nats
+  version: fc85f44c1659ab6610d76fd6bd0e44ad2cadf697
+  subpackages:
+  - encoders/protobuf
+  - encoders/builtin
+- name: github.com/nats-io/nuid
+  version: a5152d67cf63cbfb5d992a395458722a45194715
+- name: github.com/opencontainers/runc
+  version: 8033a839758ab9a4ed4fb590d1bb005a1c5a164e
+  subpackages:
+  - libcontainer/user
+- name: github.com/pborman/uuid
+  version: a97ce2ca70fa5a848076093f05e639a89ca34d06
+- name: github.com/pmylund/go-cache
+  version: 1881a9bccb818787f68c52bfba648c6cf34c34fa
+- name: github.com/satori/go.uuid
+  version: 0aa62d5ddceb50dbcb909d790b5345affd3669b6
+- name: github.com/Sirupsen/logrus
+  version: a283a10442df8dc09befd873fab202bf8a253d6a
+- name: golang.org/x/net
+  version: 4d38db76854b199960801a1734443fd02870d7e1
+  subpackages:
+  - context
+- name: golang.org/x/sys
+  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
+  subpackages:
+  - unix
+- name: gopkg.in/bluesuncorp/validator.v8
+  version: 5f57d2222ad794d0dffb07e664ea05e2ee07d60c
+- name: gopkg.in/mgo.v2
+  version: 29cc868a5ca65f401ff318143f9408d02f4799cc
+  subpackages:
+  - bson
+  - internal/sasl
+  - internal/scram
+- name: gopkg.in/mgutz/dat.v1
+  version: 12949dfa90b45a1a62e6227fc1607c4fa1a3274c
+  subpackages:
+  - kvs
+  - sqlx-runner
+  - common
+  - reflectx
+  - postgres
+- name: gopkg.in/mgutz/dat.v1/sqlx-runner
+  version: 12949dfa90b45a1a62e6227fc1607c4fa1a3274c
+testImports: []
