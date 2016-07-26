@@ -105,6 +105,16 @@ func (this *TestEnvironment) WithPostgres() *TestEnvironment {
 	return this
 }
 
+// A ftp container (note - can only run one at a time)
+func (this *TestEnvironment) WithFtp() *TestEnvironment {
+	this.funcList = append(this.funcList, startAndWaitFuncs{
+		name: "ftp",
+		startFunc: prefab.StartFtpContainer,
+		waitFunc: prefab.WaitForFtp,
+	})
+	return this
+}
+
 // Launch the queued containers
 func (this *TestEnvironment) Launch() {
 	wg :=  sync.WaitGroup{}
