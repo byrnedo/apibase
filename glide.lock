@@ -1,10 +1,10 @@
 hash: fd66d7e3180955657151cba8da8f22cfe7da78e1a71ce9ae548feed290ca59b6
-updated: 2016-07-29T13:35:44.206681306+02:00
+updated: 2016-07-29T16:08:29.067016572+02:00
 imports:
 - name: github.com/byrnedo/mapcast
   version: 76b07c9b4c2ce7ee42b418be65317345d0d68d5b
 - name: github.com/byrnedo/prefab
-  version: 4c49063583d90c531858495b01efe27f97da804c
+  version: 9c5f74fd933d4e7e98b84abe89d0c3199d4493c5
 - name: github.com/byrnedo/svccommon
   version: 43195f2fd5d0c9d74a1e832f352c09b28fb103de
   subpackages:
