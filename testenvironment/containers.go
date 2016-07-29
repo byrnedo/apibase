@@ -115,6 +115,16 @@ func (this *TestEnvironment) WithFtp() *TestEnvironment {
 	return this
 }
 
+// An Sftp container
+func (this *TestEnvironment) WithSftp() *TestEnvironment {
+	this.funcList = append(this.funcList, startAndWaitFuncs{
+		name: "sftp",
+		startFunc: prefab.StartSftpContainer,
+		waitFunc: prefab.WaitForSftp,
+	})
+	return this
+}
+
 // Launch the queued containers
 func (this *TestEnvironment) Launch() {
 	wg :=  sync.WaitGroup{}
