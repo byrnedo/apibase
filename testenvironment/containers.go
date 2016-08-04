@@ -6,6 +6,18 @@ import (
 	"time"
 )
 
+const (
+	MongoContainer  = "mongo"
+	MysqlContainer  = "mysql"
+	NatsContainer = "nats"
+	NatsStreamingContainer = "nats-streaming"
+	PostgresContainer = "postgres"
+	SftpContainer = "sftp"
+	FtpContainer = "ftp"
+
+
+)
+
 type startContainerFunc func(...prefab.ConfOverrideFunc) (string, string)
 type waitFunc func(string, time.Duration) (error)
 
@@ -48,7 +60,7 @@ func (this *TestEnvironment) WithMaxTimeout(timeout time.Duration) *TestEnvironm
 // Queue a mongo container
 func (this *TestEnvironment) WithMongo() *TestEnvironment {
 	this.funcList = append(this.funcList, startAndWaitFuncs{
-		name: "mongo",
+		name: MongoContainer,
 		startFunc: prefab.StartMongoContainer,
 		waitFunc: prefab.WaitForMongo,
 	})
@@ -58,7 +70,7 @@ func (this *TestEnvironment) WithMongo() *TestEnvironment {
 // Queue a mysql container
 func (this *TestEnvironment) WithMysql() *TestEnvironment {
 	this.funcList = append(this.funcList, startAndWaitFuncs{
-		name: "mysql",
+		name: MysqlContainer,
 		startFunc: prefab.StartMysqlContainer,
 		waitFunc: prefab.WaitForMysql,
 	})
@@ -68,7 +80,7 @@ func (this *TestEnvironment) WithMysql() *TestEnvironment {
 // Queue a mongo tmpfs container
 func (this *TestEnvironment) WithMongoTmpfs() *TestEnvironment {
 	this.funcList = append(this.funcList, startAndWaitFuncs{
-		name: "mongo",
+		name: MongoContainer,
 		startFunc: prefab.StartMongoTmpfsContainer,
 		waitFunc: prefab.WaitForMongo,
 	})
@@ -78,7 +90,7 @@ func (this *TestEnvironment) WithMongoTmpfs() *TestEnvironment {
 // Queue a mysql container on tmpfs
 func (this *TestEnvironment) WithMysqlTmpfs() *TestEnvironment {
 	this.funcList = append(this.funcList, startAndWaitFuncs{
-		name: "mysql",
+		name: MysqlContainer,
 		startFunc: prefab.StartMysqlTmpfsContainer,
 		waitFunc: prefab.WaitForMysql,
 	})
@@ -88,9 +100,18 @@ func (this *TestEnvironment) WithMysqlTmpfs() *TestEnvironment {
 // Queue a nats container
 func (this *TestEnvironment) WithNats() *TestEnvironment {
 	this.funcList = append(this.funcList, startAndWaitFuncs{
-		name: "nats",
+		name: NatsContainer,
 		startFunc: prefab.StartNatsContainer,
 		waitFunc: prefab.WaitForNats,
+	})
+	return this
+}
+
+func (this *TestEnvironment) WithNatsStreaming() *TestEnvironment {
+	this.funcList = append(this.funcList, startAndWaitFuncs{
+		name: NatsStreamingContainer,
+		startFunc: prefab.StartNatsStreamingContainer,
+		waitFunc: prefab.WaitForNatsStreaming,
 	})
 	return this
 }
@@ -98,7 +119,7 @@ func (this *TestEnvironment) WithNats() *TestEnvironment {
 // Queue a postgres container
 func (this *TestEnvironment) WithPostgres() *TestEnvironment {
 	this.funcList = append(this.funcList, startAndWaitFuncs{
-		name: "postgres",
+		name: PostgresContainer,
 		startFunc: prefab.StartPostgresContainer,
 		waitFunc: prefab.WaitForPostgres,
 	})
@@ -108,7 +129,7 @@ func (this *TestEnvironment) WithPostgres() *TestEnvironment {
 // A ftp container (note - can only run one at a time)
 func (this *TestEnvironment) WithFtp() *TestEnvironment {
 	this.funcList = append(this.funcList, startAndWaitFuncs{
-		name: "ftp",
+		name: FtpContainer,
 		startFunc: prefab.StartFtpContainer,
 		waitFunc: prefab.WaitForFtp,
 	})
@@ -118,7 +139,7 @@ func (this *TestEnvironment) WithFtp() *TestEnvironment {
 // An Sftp container
 func (this *TestEnvironment) WithSftp() *TestEnvironment {
 	this.funcList = append(this.funcList, startAndWaitFuncs{
-		name: "sftp",
+		name: SftpContainer,
 		startFunc: prefab.StartSftpContainer,
 		waitFunc: prefab.WaitForSftp,
 	})
