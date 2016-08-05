@@ -1,0 +1,20 @@
+language: go
+go:
+    - 1.6.3
+sudo: required
+
+services:
+    - docker
+
+addons:
+    apt:
+        sources:
+            - sourceline: 'ppa:masterminds/glide'
+        packages:
+            - glide
+
+install: make deps
+
+script:
+    - make test
+    - make build
