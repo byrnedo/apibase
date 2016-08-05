@@ -1,7 +1,5 @@
 package defaultstreaming
 
-import "github.com/nats-io/go-nats-streaming"
-
 import (
 	"github.com/byrnedo/apibase/config"
 	"github.com/nats-io/nats"
@@ -11,7 +9,7 @@ import (
 	"github.com/byrnedo/apibase/natsio/streaming"
 )
 
-var StanConn stan.Conn
+var StanConn streaming.Stan
 
 func init() {
 
