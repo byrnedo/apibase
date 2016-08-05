@@ -39,29 +39,18 @@ func TestMain(m *testing.M) {
 
 func stanConnect(t *testing.T) stan.Conn {
 	clientIdInc ++
-	stanOpts := StanOptions{}
-	stanOpts.Options = nats.DefaultOptions
-	stanOpts.ClusterId = "test-cluster"
-	stanOpts.ClientId = fmt.Sprintf("test-client-%d", clientIdInc)
-	stanOpts.Options.Url = stanUrl
+	stanOpts := NewStanOptions(func(o *StanOptions)error{
+		o.Options = nats.DefaultOptions
+		o.ClusterId = "test-cluster"
+		o.ClientId = fmt.Sprintf("test-client-%d", clientIdInc)
+		o.Options.Url = stanUrl
+		return nil
+	})
 
 
-	var (
-		//stanCon stan.Conn
-		natsCon *nats.Conn
-		err error
-	)
-
-
-	natsCon, err = stanOpts.Connect()
+	stanCon, err := stanOpts.Connect()
 	if err != nil {
 		t.Fatal(err)
-	}
-
-
-	stanCon, err := stan.Connect(stanOpts.ClusterId, stanOpts.ClientId, stan.NatsConn(natsCon), stan.ConnectWait(15*time.Second))
-	if err != nil {
-		panic("Failed to get stan con:" + err.Error())
 	}
 
 	return stanCon

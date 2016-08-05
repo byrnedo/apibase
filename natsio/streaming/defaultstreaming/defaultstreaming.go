@@ -42,13 +42,12 @@ func init() {
 
 	Info.Print("Connecting to stan nats")
 	var (
-		con *nats.Conn
 		err error
 	)
 	attempts := 1
 	for attempts <= 5 {
 		attempts ++
-		con, err = natsOpts.Connect()
+		StanConn, err = stanOpts.Connect()
 		if err == nil {
 			Warning.Println(err)
 			break
@@ -56,13 +55,6 @@ func init() {
 		time.Sleep(2 * time.Second)
 	}
 
-	if err != nil {
-		panic("Failed to connect to stan nats:" + err.Error())
-	}
-
-	Info.Print("Connected to stan nats")
-
-	StanConn, err = stan.Connect(stanOpts.ClusterId, stanOpts.ClientId, stan.NatsConn(con))
 	if err != nil {
 		panic("Failed to get stan con:" + err.Error())
 	}
