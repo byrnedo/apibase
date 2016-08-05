@@ -1,73 +1,124 @@
 package streaming
 
 import (
-	"github.com/nats-io/nats"
 	"github.com/nats-io/go-nats-streaming"
 	"time"
-	"fmt"
+	"errors"
+	"github.com/gogo/protobuf/proto"
+	. "github.com/byrnedo/apibase/natsio/protobuf"
+	"github.com/pborman/uuid"
 )
 
-type StanOptions struct {
-	nats.Options
-	ClientId string
-	ClusterId string
+// stan.Options wrapper.
+type Stan struct {
+	Opts   *StanOptions
+	Con stan.Conn
 }
 
-// Function for applying options to StanOptions in NewStanOptions
-// Using a function allows for a chain or heirarchy when applying them
-// eg func1 then func2 then func3
-// Internally allows for default options to be applied first.
-type OptionsFunc func(*StanOptions) error
-
-func prepend(slice []OptionsFunc, item OptionsFunc) []OptionsFunc {
-	slice = append(slice, nil)
-	copy(slice[1:], slice)
-	slice[0] = item
-	return slice
-}
-
-// Initiating nats with default options and then applies each
-// option func in order on top of that.
-func NewStanOptions(optionFuncs ...OptionsFunc) (options *StanOptions) {
-	options = &StanOptions{Options: nats.DefaultOptions}
-	options.setOptions(prepend(optionFuncs, setDefaultOptions)...)
-	return
-}
-
-func (n *StanOptions) setOptions(optionFuncs ...OptionsFunc) error {
-	for _, opt := range optionFuncs {
-		if err := opt(n); err != nil {
-			return err
-		}
+// Subscribe and record subscription to routes
+func (n *Stan) Subscribe(route string, handler stan.MsgHandler, opts ...stan.SubscriptionOption) error {
+	subsc, err := n.Con.Subscribe(route, handler, opts...)
+	if err != nil {
+		return errors.New("Failed to make subcriptions for " + route + ": " + err.Error())
 	}
+	n.Opts.routes = append(n.Opts.routes, &Route{route: route, handler: handler, subsc: subsc})
 	return nil
 }
 
-// Start subscribing to subjects/routes.
-func (stanOpts *StanOptions) Connect() (stan.Conn, error) {
-	if len(stanOpts.ClientId) == 0 {
-		panic("Must set client id in StanOptions")
-	}
-	if len(stanOpts.ClusterId) == 0 {
-		panic("Must set cluster id in StanOptions")
-	}
-
-	con, err := stanOpts.Options.Connect()
+// Subscribe to queue group and record subscription to routes
+func (n *Stan) QueueSubscribe(route string, group string, handler stan.MsgHandler) error {
+	subsc, err := n.Con.QueueSubscribe(route, group, handler)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to connect to underlying nats: %s", err)
+		return errors.New("Failed to make subcriptions for " + route + ": " + err.Error())
 	}
-
-	stanCon, err := stan.Connect(stanOpts.ClusterId, stanOpts.ClientId, stan.NatsConn(con))
-	if err != nil {
-		return nil, fmt.Errorf("Failed to get stan con: %s", err)
-	}
-	return stanCon, nil
+	n.Opts.routes = append(n.Opts.routes, &Route{route: route, handler: handler, subsc: subsc, queueGroup: group})
+	return nil
 }
 
-func setDefaultOptions(options *StanOptions) error {
-	options.MaxReconnect = 5
-	options.ReconnectWait = (2 * time.Second)
-	options.Timeout = (10 * time.Second)
-	options.NoRandomize = true
-	return nil
+// For use when using nats request/publish/publishrequest wrapper functions
+type PayloadWithContext interface {
+	proto.Message
+	GetContext() *NatsContext
+	SetContext(*NatsContext)
+}
+
+// Adds a context if it doesn't exist. Otherwise appends which app and time
+// that this message is being sent at.
+// Adds a traceID if not already there
+func (n *Stan) updateContext(data PayloadWithContext, requestType RequestType) {
+	var ctx *NatsContext
+
+	if data.GetContext() == nil {
+		data.SetContext(&NatsContext{})
+	}
+
+	ctx = data.GetContext()
+
+	if len(ctx.GetTraceId()) == 0 {
+		newId := uuid.NewUUID().String()
+		ctx.TraceId = &newId
+	}
+	timeNow := time.Now().Unix()
+	ctx.Trail = append(ctx.Trail, &NatsContext_Trail{&(n.Opts.Name), &requestType, &timeNow, nil})
+
+}
+
+// Wrapper for stan Publish function. Needs a payload which has
+// a context object (see PayloadWithContext type)
+// Adds a context if it doesn't exist. Otherwise appends which app and time
+// that this message is being sent at.
+// Adds a traceID if not already there
+func (n *Stan) Publish(subject string, data PayloadWithContext) error {
+	n.updateContext(data, RequestType_PUB)
+	bData, err := proto.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return n.Con.Publish(subject, bData)
+}
+
+// Wrapper for stan PublishAsync function with context.
+// Adds a context if it doesn't exist. Otherwise appends which app and time
+// that this message is being sent at.
+// Adds a traceID if not already there
+func (n *Stan) PublishAsync(subject string, data PayloadWithContext, ackH stan.AckHandler) (string, error) {
+	n.updateContext(data, RequestType_PUB)
+	bData, err := proto.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	return n.Con.PublishAsync(subject, bData, ackH)
+}
+
+// Wrapper for stan PublishWithReply function with context.
+// Adds a context if it doesn't exist. Otherwise appends which app and time
+// that this message is being sent at.
+// Adds a traceID if not already there
+func (n *Stan) PublishWithReply(subject string, reply string, data PayloadWithContext) error {
+	n.updateContext(data, RequestType_PUBREQ)
+	bData, err := proto.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return n.Con.PublishWithReply(subject, reply, bData)
+}
+
+// Wrapper for stan PublishAsnycWithReply function with context.
+// Adds a context if it doesn't exist. Otherwise appends which app and time
+// that this message is being sent at.
+// Adds a traceID if not already there
+func (n *Stan) PublishAsyncWithReply(subject string, reply string, data PayloadWithContext, ackH stan.AckHandler) (string, error) {
+	n.updateContext(data, RequestType_PUBREQ)
+	bData, err := proto.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	return n.Con.PublishAsyncWithReply(subject, reply, bData, ackH)
+}
+
+// Unsubscribe all handlers
+func (n *Stan) UnsubscribeAll() {
+	for _, route := range n.Opts.routes {
+		route.subsc.Unsubscribe()
+	}
 }
