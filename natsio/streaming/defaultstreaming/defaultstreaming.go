@@ -9,7 +9,7 @@ import (
 	"github.com/byrnedo/apibase/natsio/streaming"
 )
 
-var StanConn streaming.Stan
+var StanConn *streaming.Stan
 
 func init() {
 
