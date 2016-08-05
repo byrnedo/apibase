@@ -1,5 +1,5 @@
-hash: fd66d7e3180955657151cba8da8f22cfe7da78e1a71ce9ae548feed290ca59b6
-updated: 2016-08-04T16:26:24.872098156+02:00
+hash: 289d2b136565d2cbcb483cf370b9984243ec9c5978610404fea1316beda8cc1d
+updated: 2016-08-05T09:37:45.282785869+02:00
 imports:
 - name: github.com/byrnedo/mapcast
   version: 76b07c9b4c2ce7ee42b418be65317345d0d68d5b
@@ -51,6 +51,8 @@ imports:
   version: 4168943e65a2802828518e95310aeeed6d84c4e5
   subpackages:
   - proto
+  - gogoproto
+  - protoc-gen-gogo/descriptor
 - name: github.com/golang/protobuf
   version: 874264fbbb43f4d91e999fecb4b40143ed611400
   subpackages:
@@ -81,6 +83,10 @@ imports:
   - v1
 - name: github.com/mgutz/str
   version: 968bf66e3da857419e4f6e71b2d5c9ae95682dc4
+- name: github.com/nats-io/go-nats-streaming
+  version: 1875d675b301931c7037d118eac68dca8c99ceed
+  subpackages:
+  - pb
 - name: github.com/nats-io/nats
   version: fc85f44c1659ab6610d76fd6bd0e44ad2cadf697
   subpackages:

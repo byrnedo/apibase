@@ -39,3 +39,5 @@ import:
   subpackages:
   - kvs
   - sqlx-runner
+- package: github.com/nats-io/go-nats-streaming
+  version: ^0.2.0
