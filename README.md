@@ -1,4 +1,7 @@
+[![Build Status](https://travis-ci.org/byrnedo/apibase.svg?branch=master)](https://travis-ci.org/byrnedo/apibase)
+
 # apibase
+
 Base template/helper code for http apis.
 
 Stack: 
