@@ -22,10 +22,6 @@ func init() {
 
 	Info.Printf("Stan underlying Nats options: %#v", natsOpts)
 
-	encoding := config.Conf.GetDefaultString("stan.nats.encoding", "protobuf")
-
-	Info.Println("Nats encoding:", encoding)
-
 	natsOpts.AsyncErrorCB = func(c *nats.Conn, s *nats.Subscription, err error) {
 		Error.Println("Got stan nats async error:", err)
 	}
