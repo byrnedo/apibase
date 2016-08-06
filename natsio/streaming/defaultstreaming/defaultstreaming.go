@@ -17,6 +17,7 @@ func init() {
 	stanOpts.Options = nats.DefaultOptions
 
 	parse.Populate(&stanOpts, config.Conf, "stan")
+	parse.Populate(&stanOpts.Options, config.Conf, "stan.nats")
 
 	natsOpts := stanOpts.Options
 
@@ -43,8 +44,9 @@ func init() {
 		attempts ++
 		StanConn, err = stanOpts.Connect()
 		if err == nil {
-			Warning.Println(err)
 			break
+		} else {
+			Warning.Println(err)
 		}
 		time.Sleep(2 * time.Second)
 	}
@@ -52,4 +54,5 @@ func init() {
 	if err != nil {
 		panic("Failed to get stan con:" + err.Error())
 	}
+	Info.Println("Connected to nats streaming server")
 }

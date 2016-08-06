@@ -60,8 +60,9 @@ func init() {
 		attempts ++
 		Conn, err = natsOpts.Connect()
 		if err == nil {
-			Warning.Println(err)
 			break
+		} else {
+			Warning.Println(err)
 		}
 		time.Sleep(2 * time.Second)
 	}
