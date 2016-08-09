@@ -1,18 +1,18 @@
 package streaming
 
 import (
-	"github.com/nats-io/go-nats-streaming"
-	"time"
 	"errors"
-	"github.com/gogo/protobuf/proto"
 	. "github.com/byrnedo/apibase/natsio/protobuf"
+	"github.com/gogo/protobuf/proto"
+	"github.com/nats-io/go-nats-streaming"
 	"github.com/pborman/uuid"
+	"time"
 )
 
 // stan.Options wrapper.
 type Stan struct {
-	Opts   *StanOptions
-	Con stan.Conn
+	Opts *StanOptions
+	Con  stan.Conn
 }
 
 // Subscribe and record subscription to routes
@@ -26,8 +26,8 @@ func (n *Stan) Subscribe(route string, handler stan.MsgHandler, opts ...stan.Sub
 }
 
 // Subscribe to queue group and record subscription to routes
-func (n *Stan) QueueSubscribe(route string, group string, handler stan.MsgHandler) error {
-	subsc, err := n.Con.QueueSubscribe(route, group, handler)
+func (n *Stan) QueueSubscribe(route string, group string, handler stan.MsgHandler, opts ...stan.SubscriptionOption) error {
+	subsc, err := n.Con.QueueSubscribe(route, group, handler, opts...)
 	if err != nil {
 		return errors.New("Failed to make subcriptions for " + route + ": " + err.Error())
 	}
