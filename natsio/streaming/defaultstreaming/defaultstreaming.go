@@ -23,19 +23,17 @@ func init() {
 	// make client id unique
 	stanOpts.ClientId = stanOpts.ClientId + "-" + helpers.RandStringBytesMaskImprSrc(5)
 
-	natsOpts := stanOpts.Options
+	Info.Printf("Stan underlying Nats options: %#v", stanOpts.Options)
 
-	Info.Printf("Stan underlying Nats options: %#v", natsOpts)
-
-	natsOpts.AsyncErrorCB = func(c *nats.Conn, s *nats.Subscription, err error) {
+	stanOpts.AsyncErrorCB = func(c *nats.Conn, s *nats.Subscription, err error) {
 		Error.Println("Got stan nats async error:", err)
 	}
 
-	natsOpts.DisconnectedCB = func(c *nats.Conn) {
+	stanOpts.DisconnectedCB = func(c *nats.Conn) {
 		Warning.Println("Stan Nats disconnected")
 	}
 
-	natsOpts.ReconnectedCB = func(c *nats.Conn) {
+	stanOpts.ReconnectedCB = func(c *nats.Conn) {
 		Info.Println("Stan Nats reconnected")
 	}
 
