@@ -25,7 +25,7 @@ import:
 - package: github.com/lib/pq
 - package: github.com/mattn/go-sqlite3
   version: ^1.1.0
-- package: github.com/nats-io/nats
+- package: github.com/nats-io/go-nats
   version: ^1.2.0
   subpackages:
   - encoders/protobuf

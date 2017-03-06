@@ -1,7 +1,7 @@
 package streaming
 
 import (
-	"github.com/nats-io/nats"
+	"github.com/nats-io/go-nats"
 	"github.com/nats-io/go-nats-streaming"
 	"time"
 	"fmt"

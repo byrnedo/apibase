@@ -1,6 +1,6 @@
 package routes
 
-import "github.com/nats-io/nats"
+import "github.com/nats-io/go-nats"
 
 // Holder for a nats route's info.
 type NatsRoute struct {

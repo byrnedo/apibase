@@ -6,7 +6,7 @@ import (
 	"github.com/byrnedo/apibase/testenvironment"
 	"os"
 	"github.com/nats-io/go-nats-streaming"
-	"github.com/nats-io/nats"
+	"github.com/nats-io/go-nats"
 	"time"
 	pth "github.com/byrnedo/apibase/helpers/pointerhelp"
 )

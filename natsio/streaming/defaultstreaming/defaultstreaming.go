@@ -2,7 +2,7 @@ package defaultstreaming
 
 import (
 	"github.com/byrnedo/apibase/config"
-	"github.com/nats-io/nats"
+	"github.com/nats-io/go-nats"
 	"github.com/byrnedo/typesafe-config/parse"
 	. "github.com/byrnedo/apibase/logger"
 	"time"

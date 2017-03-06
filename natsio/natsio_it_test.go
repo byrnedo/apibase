@@ -3,8 +3,8 @@ package natsio
 import (
 	"github.com/byrnedo/prefab"
 	. "github.com/byrnedo/apibase/natsio/protobuf"
-	"github.com/nats-io/nats"
-	"github.com/nats-io/nats/encoders/protobuf"
+	"github.com/nats-io/go-nats"
+	"github.com/nats-io/go-nats/encoders/protobuf"
 	"os"
 	"reflect"
 	"testing"

@@ -20,7 +20,7 @@ import (
 	"github.com/byrnedo/apibase/natsio"
 	"github.com/byrnedo/typesafe-config/parse"
 	"time"
-	"github.com/nats-io/nats"
+	"github.com/nats-io/go-nats"
 )
 
 var Conn *natsio.Nats
