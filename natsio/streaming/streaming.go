@@ -90,32 +90,6 @@ func (n *Stan) PublishAsync(subject string, data PayloadWithContext, ackH stan.A
 	return n.Con.PublishAsync(subject, bData, ackH)
 }
 
-// Wrapper for stan PublishWithReply function with context.
-// Adds a context if it doesn't exist. Otherwise appends which app and time
-// that this message is being sent at.
-// Adds a traceID if not already there
-func (n *Stan) PublishWithReply(subject string, reply string, data PayloadWithContext) error {
-	n.updateContext(data, RequestType_PUBREQ)
-	bData, err := proto.Marshal(data)
-	if err != nil {
-		return err
-	}
-	return n.Con.PublishWithReply(subject, reply, bData)
-}
-
-// Wrapper for stan PublishAsnycWithReply function with context.
-// Adds a context if it doesn't exist. Otherwise appends which app and time
-// that this message is being sent at.
-// Adds a traceID if not already there
-func (n *Stan) PublishAsyncWithReply(subject string, reply string, data PayloadWithContext, ackH stan.AckHandler) (string, error) {
-	n.updateContext(data, RequestType_PUBREQ)
-	bData, err := proto.Marshal(data)
-	if err != nil {
-		return "", err
-	}
-	return n.Con.PublishAsyncWithReply(subject, reply, bData, ackH)
-}
-
 // Unsubscribe all handlers
 func (n *Stan) UnsubscribeAll() {
 	for _, route := range n.Opts.routes {
