@@ -17,9 +17,15 @@ type RestClient struct {
 	lastResponseBody []byte
 }
 
-func NewRestClient() *RestClient {
+type ClientOptsFunc func(*http.Client)
+
+func NewRestClient(optFuncs ...ClientOptsFunc) *RestClient {
 	timeout := time.Duration(5 * time.Second)
-	return &RestClient{nil, &http.Client{Timeout: timeout}, http.Response{}, nil}
+	c := &http.Client{Timeout: timeout}
+	for _, f := range optFuncs {
+		f(c)
+	}
+	return &RestClient{nil, c, http.Response{}, nil}
 }
 
 func (c *RestClient) Client() *http.Client {
