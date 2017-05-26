@@ -7,7 +7,7 @@ import (
 	. "github.com/byrnedo/apibase/logger"
 	"time"
 	"github.com/byrnedo/apibase/natsio/streaming"
-	"github.com/byrnedo/capitan/helpers"
+	"github.com/byrnedo/apibase/helpers/stringhelp"
 )
 
 var StanConn *streaming.Stan
@@ -21,7 +21,7 @@ func init() {
 	parse.Populate(&stanOpts.Options, config.Conf, "stan.nats")
 
 	// make client id unique
-	stanOpts.ClientId = stanOpts.ClientId + "-" + helpers.RandStringBytesMaskImprSrc(5)
+	stanOpts.ClientId = stanOpts.ClientId + "-" + stringhelp.RandString(5)
 
 	Info.Printf("Stan underlying Nats options: %#v", stanOpts.Options)
 
