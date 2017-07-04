@@ -3,7 +3,7 @@ import:
 - package: github.com/DavidHuie/gomigrate
 - package: github.com/byrnedo/mapcast
 - package: github.com/byrnedo/prefab
-  version: ^0.1.0
+  version: ^0.1.5
 - package: github.com/byrnedo/svccommon
   subpackages:
   - msgspec/web

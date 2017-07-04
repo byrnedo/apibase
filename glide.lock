@@ -1,16 +1,10 @@
-hash: 5b30e1311ad00ae57ad0f868e5262869af2968a2ccac961994809885c4556521
-updated: 2017-03-06T12:42:09.541123196+01:00
+hash: 71692637d4ea2f95b6ad3aad389ad497d76b843d460c6c1ef6e7eab777028eb3
+updated: 2017-07-04T12:11:47.999987483+02:00
 imports:
-- name: github.com/byrnedo/capitan
-  version: 5274c154ed7046f7ab6c6003b056aa625c377153
-  subpackages:
-  - consts
-  - helpers
-  - logger
 - name: github.com/byrnedo/mapcast
   version: 76b07c9b4c2ce7ee42b418be65317345d0d68d5b
 - name: github.com/byrnedo/prefab
-  version: 79f33ce5739156b681e45092da3f2053bbc2acb8
+  version: c1a2256e5983985e653cbe3a887252456b982e07
 - name: github.com/byrnedo/svccommon
   version: 43195f2fd5d0c9d74a1e832f352c09b28fb103de
   subpackages:
@@ -21,44 +15,40 @@ imports:
   - parse
 - name: github.com/cenkalti/backoff
   version: b02f2bbce11d7ea6b97f282ef1771b0fe2f65ef3
-- name: github.com/codegangsta/inject
-  version: 33e0aa1cb7c019ccc3fbe049a8262a6403d30504
-- name: github.com/codeskyblue/go-sh
-  version: ceb46ec4630a726eeed51d0a70066c9e1102c48f
 - name: github.com/DavidHuie/gomigrate
   version: 1b90a570dc6b7aaaefa233eacf304be363a89603
 - name: github.com/fsouza/go-dockerclient
   version: 6fb38e6bb3d544d7eb5b55fd396cd4e6850802d8
   subpackages:
-  - external/github.com/Sirupsen/logrus
   - external/github.com/docker/docker/opts
   - external/github.com/docker/docker/pkg/archive
   - external/github.com/docker/docker/pkg/fileutils
   - external/github.com/docker/docker/pkg/homedir
+  - external/github.com/docker/docker/pkg/stdcopy
+  - external/github.com/hashicorp/go-cleanhttp
+  - external/github.com/Sirupsen/logrus
   - external/github.com/docker/docker/pkg/idtools
   - external/github.com/docker/docker/pkg/ioutils
-  - external/github.com/docker/docker/pkg/longpath
   - external/github.com/docker/docker/pkg/pools
   - external/github.com/docker/docker/pkg/promise
-  - external/github.com/docker/docker/pkg/stdcopy
   - external/github.com/docker/docker/pkg/system
-  - external/github.com/docker/go-units
-  - external/github.com/hashicorp/go-cleanhttp
+  - external/github.com/docker/docker/pkg/longpath
   - external/github.com/opencontainers/runc/libcontainer/user
-  - external/golang.org/x/net/context
   - external/golang.org/x/sys/unix
+  - external/golang.org/x/net/context
+  - external/github.com/docker/go-units
 - name: github.com/garyburd/redigo
   version: 0d253a66e6e1349f4581d6d2b300ee434ee2da9f
   subpackages:
-  - internal
   - redis
+  - internal
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/gogo/protobuf
-  version: 909568be09de550ed094403c2bf8a261b5bb730a
+  version: 100ba4e885062801d56799d78530b73b178a78f3
   subpackages:
-  - gogoproto
   - proto
+  - gogoproto
   - protoc-gen-gogo/descriptor
 - name: github.com/golang/protobuf
   version: 98fa357170587e470c5f27d3c3ea0947b71eb455
@@ -74,18 +64,10 @@ imports:
   version: 699d6b1bd83a497693f0863c142dd8759b35eb80
   subpackages:
   - oid
-- name: github.com/mattn/go-colorable
-  version: acb9493f2794fd0f820de7a27a217dafbb1b65ea
-- name: github.com/mattn/go-isatty
-  version: 9622e0cc9d8f9be434ca605520ff9a16808fee47
 - name: github.com/mattn/go-sqlite3
   version: ca5e3819723d8eeaf170ad510e7da1d6d2e94a08
-- name: github.com/mgutz/ansi
-  version: c286dcecd19ff979eeb73ea444e479b903f2cfcb
 - name: github.com/mgutz/logxi
   version: aebf8a7d67ab4625e0fd4a665766fef9a709161b
-  subpackages:
-  - v1
 - name: github.com/mgutz/str
   version: 968bf66e3da857419e4f6e71b2d5c9ae95682dc4
 - name: github.com/nats-io/go-nats
@@ -108,30 +90,26 @@ imports:
 - name: github.com/pmylund/go-cache
   version: e7a9def80f35fe1b170b7b8b68871d59dea117e1
 - name: github.com/satori/go.uuid
-  version: b061729afc07e77a8aa4fad0a2fd840958f1942a
+  version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: golang.org/x/net
   version: 30db96677b74e24b967e23f911eb3364fc61a011
   subpackages:
   - context
-- name: golang.org/x/sys
-  version: d4feaf1a7e61e1d9e79e6c4e76c6349e9cab0a03
-  subpackages:
-  - unix
 - name: gopkg.in/bluesuncorp/validator.v8
   version: 5f57d2222ad794d0dffb07e664ea05e2ee07d60c
 - name: gopkg.in/mgo.v2
   version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
   subpackages:
   - bson
-  - internal/json
   - internal/sasl
   - internal/scram
+  - internal/json
 - name: gopkg.in/mgutz/dat.v1
-  version: c2a5759ae4b0303a8bf640d01a85ae3acc02455d
+  version: f2918ee2c9dd12bc7f27302aa28333ffcabc24d2
   subpackages:
-  - common
   - kvs
-  - postgres
-  - reflectx
   - sqlx-runner
+  - common
+  - reflectx
+  - postgres
 testImports: []
