@@ -6,15 +6,15 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"time"
 	"strings"
+	"time"
 )
 
 type Response struct {
-	Response     http.Response
+	Response http.Response
 }
 
-func (this *Response) GetBody() []byte{
+func (this *Response) GetBody() []byte {
 	defer this.Response.Body.Close()
 	r, _ := ioutil.ReadAll(this.Response.Body)
 	return r
@@ -22,7 +22,9 @@ func (this *Response) GetBody() []byte{
 
 // Must be called if not using AsJson or GetBody
 func (this *Response) Close() {
-	this.Response.Body.Close()
+	if this.Response.Body != nil {
+		this.Response.Body.Close()
+	}
 }
 
 func (this *Response) AsJson(result interface{}) error {
@@ -31,7 +33,7 @@ func (this *Response) AsJson(result interface{}) error {
 
 type RestClient struct {
 	Headers map[string]string
-	client           *http.Client
+	client  *http.Client
 }
 
 type ClientOptsFunc func(*http.Client)
@@ -63,7 +65,7 @@ func doRequest(c *RestClient, req *http.Request) (*Response, error) {
 	return res, err
 }
 
-func (c *RestClient) GetWithBytes(url string, byteData []byte) (*Response,  error) {
+func (c *RestClient) GetWithBytes(url string, byteData []byte) (*Response, error) {
 	req, err := http.NewRequest("GET", url, bytes.NewBuffer(byteData))
 	if err != nil {
 		return nil, err
@@ -168,7 +170,7 @@ func (c *RestClient) DeleteJson(url string, data interface{}) (*Response, error)
 	return c.Put(url, bytes.NewBuffer(byteData))
 }
 
-func  (c *RestClient) Do(method string, url string, data io.Reader) (*Response, error) {
+func (c *RestClient) Do(method string, url string, data io.Reader) (*Response, error) {
 	switch strings.ToLower(method) {
 	case "get":
 		return c.Get(url)
@@ -185,7 +187,7 @@ func  (c *RestClient) Do(method string, url string, data io.Reader) (*Response, 
 	}
 }
 
-func  (c *RestClient) DoString(method string, url string, data string) (*Response, error) {
+func (c *RestClient) DoString(method string, url string, data string) (*Response, error) {
 	switch strings.ToLower(method) {
 	case "get":
 		return c.Get(url)
@@ -202,7 +204,7 @@ func  (c *RestClient) DoString(method string, url string, data string) (*Respons
 	}
 }
 
-func  (c *RestClient) DoJson(method string, url string, data interface{}) (*Response, error) {
+func (c *RestClient) DoJson(method string, url string, data interface{}) (*Response, error) {
 	switch strings.ToLower(method) {
 	case "get":
 		return c.Get(url)
