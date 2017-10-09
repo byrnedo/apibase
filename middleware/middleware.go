@@ -64,3 +64,18 @@ func AcceptJsonHandler(next http.Handler) http.Handler {
 	}
 	return http.HandlerFunc(fn)
 }
+
+//ForceType application/octet-stream
+//Header set Content-Disposition attachment
+func FileDownloadHandler(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		// We send a JSON-API error if the Accept header does not have a valid value.
+		shouldDownload := r.URL.Query().Get("dl")
+		if shouldDownload == "1" || shouldDownload == "true" {
+			w.Header().Set("Content-Type", "application/octet-stream")
+			w.Header().Set("Content-Disposition", "attachment")
+		}
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
+}
