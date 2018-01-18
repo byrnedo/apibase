@@ -41,3 +41,12 @@ func (m *NatsContext_Trail) GetTimeTs() *time.Time {
 	t := time.Unix(dS, int64(dN))
 	return &t
 }
+
+
+func (m *NatsContext) GetLastTrail() *NatsContext_Trail {
+	if len(m.Trail) < 1 {
+		return nil
+	}
+
+	return m.Trail[len(m.Trail) - 1]
+}
