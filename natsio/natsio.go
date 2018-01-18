@@ -45,7 +45,7 @@ type PayloadWithContext interface {
 // Adds a context if it doesn't exist. Otherwise appends which app and time
 // that this message is being sent at.
 // Adds a traceID if not already there
-func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
+func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType, deadline *time.Time) {
 	var ctx *NatsContext
 
 	if data.GetContext() == nil {
@@ -58,8 +58,18 @@ func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
 		newId := uuid.NewUUID().String()
 		ctx.TraceId = &newId
 	}
-	timeNow := time.Now().Unix()
-	ctx.Trail = append(ctx.Trail, &NatsContext_Trail{&(n.Opts.Name), &requestType, &timeNow, nil})
+	now := time.Now()
+	nowSecs := now.Unix()
+	nowNanos := int32(now.Nanosecond())
+	newTrail := &NatsContext_Trail{AppName: &(n.Opts.Name), PutType: &requestType, Time: &nowSecs, TimeNanos: &nowNanos}
+
+	if deadline != nil {
+		deadSecs := deadline.Unix()
+		deadNanos := int32(deadline.Nanosecond())
+		newTrail.Deadline = &deadSecs
+		newTrail.DeadlineNanos = &deadNanos
+	}
+	ctx.Trail = append(ctx.Trail, newTrail)
 
 }
 
@@ -69,7 +79,7 @@ func (n *Nats) updateContext(data PayloadWithContext, requestType RequestType) {
 // that this message is being sent at.
 // Adds a traceID if not already there
 func (n *Nats) Publish(subject string, data PayloadWithContext) error {
-	n.updateContext(data, RequestType_PUB)
+	n.updateContext(data, RequestType_PUB, nil)
 	return n.EncCon.Publish(subject, data)
 }
 
@@ -78,7 +88,7 @@ func (n *Nats) Publish(subject string, data PayloadWithContext) error {
 // that this message is being sent at.
 // Adds a traceID if not already there
 func (n *Nats) PublishRequest(subject string, reply string, data PayloadWithContext) error {
-	n.updateContext(data, RequestType_PUBREQ)
+	n.updateContext(data, RequestType_PUBREQ, nil)
 	return n.EncCon.PublishRequest(subject, reply, data)
 }
 
@@ -87,7 +97,8 @@ func (n *Nats) PublishRequest(subject string, reply string, data PayloadWithCont
 // that this message is being sent at.
 // Adds a traceID if not already there
 func (n *Nats) Request(subject string, data PayloadWithContext, responsePtr interface{}, timeout time.Duration) error {
-	n.updateContext(data, RequestType_REQ)
+	dead := time.Now().Add(timeout)
+	n.updateContext(data, RequestType_REQ, &dead)
 	return n.EncCon.Request(subject, data, responsePtr, timeout)
 }
 

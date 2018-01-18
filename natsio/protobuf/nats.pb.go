@@ -90,6 +90,9 @@ type NatsContext_Trail struct {
 	AppName          *string      `protobuf:"bytes,1,opt,name=app_name" json:"app_name,omitempty"`
 	PutType          *RequestType `protobuf:"varint,2,opt,name=put_type,enum=protobuf.RequestType" json:"put_type,omitempty"`
 	Time             *int64       `protobuf:"varint,3,opt,name=time" json:"time,omitempty"`
+	TimeNanos        *int32       `protobuf:"varint,4,opt,name=timeNanos" json:"timeNanos,omitempty"`
+	Deadline         *int64       `protobuf:"varint,5,opt,name=deadline" json:"deadline,omitempty"`
+	DeadlineNanos    *int32       `protobuf:"varint,6,opt,name=deadlineNanos" json:"deadlineNanos,omitempty"`
 	XXX_unrecognized []byte       `json:"-"`
 }
 
@@ -114,6 +117,27 @@ func (m *NatsContext_Trail) GetPutType() RequestType {
 func (m *NatsContext_Trail) GetTime() int64 {
 	if m != nil && m.Time != nil {
 		return *m.Time
+	}
+	return 0
+}
+
+func (m *NatsContext_Trail) GetTimeNanos() int32 {
+	if m != nil && m.TimeNanos != nil {
+		return *m.TimeNanos
+	}
+	return 0
+}
+
+func (m *NatsContext_Trail) GetDeadline() int64 {
+	if m != nil && m.Deadline != nil {
+		return *m.Deadline
+	}
+	return 0
+}
+
+func (m *NatsContext_Trail) GetDeadlineNanos() int32 {
+	if m != nil && m.DeadlineNanos != nil {
+		return *m.DeadlineNanos
 	}
 	return 0
 }
@@ -193,6 +217,21 @@ func (m *NatsContext_Trail) MarshalTo(data []byte) (int, error) {
 		i++
 		i = encodeVarintNats(data, i, uint64(*m.Time))
 	}
+	if m.TimeNanos != nil {
+		data[i] = 0x20
+		i++
+		i = encodeVarintNats(data, i, uint64(*m.TimeNanos))
+	}
+	if m.Deadline != nil {
+		data[i] = 0x28
+		i++
+		i = encodeVarintNats(data, i, uint64(*m.Deadline))
+	}
+	if m.DeadlineNanos != nil {
+		data[i] = 0x30
+		i++
+		i = encodeVarintNats(data, i, uint64(*m.DeadlineNanos))
+	}
 	if m.XXX_unrecognized != nil {
 		i += copy(data[i:], m.XXX_unrecognized)
 	}
@@ -257,6 +296,15 @@ func (m *NatsContext_Trail) Size() (n int) {
 	}
 	if m.Time != nil {
 		n += 1 + sovNats(uint64(*m.Time))
+	}
+	if m.TimeNanos != nil {
+		n += 1 + sovNats(uint64(*m.TimeNanos))
+	}
+	if m.Deadline != nil {
+		n += 1 + sovNats(uint64(*m.Deadline))
+	}
+	if m.DeadlineNanos != nil {
+		n += 1 + sovNats(uint64(*m.DeadlineNanos))
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -488,6 +536,66 @@ func (m *NatsContext_Trail) Unmarshal(data []byte) error {
 				}
 			}
 			m.Time = &v
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TimeNanos", wireType)
+			}
+			var v int32
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowNats
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.TimeNanos = &v
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Deadline", wireType)
+			}
+			var v int64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowNats
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Deadline = &v
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DeadlineNanos", wireType)
+			}
+			var v int32
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowNats
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.DeadlineNanos = &v
 		default:
 			iNdEx = preIndex
 			skippy, err := skipNats(data[iNdEx:])

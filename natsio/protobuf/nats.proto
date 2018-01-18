@@ -12,6 +12,9 @@ message NatsContext {
         optional string app_name = 1;
         optional RequestType put_type = 2;
         optional int64 time = 3;
+        optional int32 timeNanos = 4;
+        optional int64 deadline = 5;
+        optional int32 deadlineNanos = 6;
     }
     repeated Trail trail = 1;
     optional string trace_id = 2;
