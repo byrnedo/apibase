@@ -58,9 +58,13 @@ func (n *Stan) updateContext(data PayloadWithContext, requestType RequestType) {
 		newId := uuid.NewUUID().String()
 		ctx.TraceId = &newId
 	}
-	timeNow := time.Now().Unix()
-	ctx.Trail = append(ctx.Trail, &NatsContext_Trail{&(n.Opts.Name), &requestType, &timeNow, nil})
+	now := time.Now()
+	nowSecs := now.Unix()
+	nowNanos := int32(now.Nanosecond())
 
+	newTrail := &NatsContext_Trail{AppName: &(n.Opts.Name), PutType: &requestType, Time: &nowSecs, TimeNanos: &nowNanos}
+
+	ctx.Trail = append(ctx.Trail, newTrail)
 }
 
 // Wrapper for stan Publish function. Needs a payload which has
